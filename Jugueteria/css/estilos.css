@@ -1,0 +1,147 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f2f6ff;
+    color: #333333;
+}
+
+.contenedor {
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.encabezado {
+    background-color: #4b7bec;
+    color: white;
+    text-align: center;
+    padding: 25px 10px;
+    margin-bottom: 20px;
+}
+
+.encabezado h1 {
+    margin: 0;
+}
+
+.menu {
+    margin-top: 15px;
+}
+
+.menu a {
+    display: inline-block;
+    background-color: white;
+    color: #4b7bec;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin: 5px;
+}
+
+.menu a:hover {
+    background-color: #dfe8ff;
+}
+
+.tarjeta {
+    background-color: white;
+    border: 1px solid #d6d6d6;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.titulo {
+    margin-top: 0;
+    color: #4b7bec;
+    text-align: center;
+}
+
+.campos {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+label {
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #bcbcbc;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #4b7bec;
+}
+
+.botones {
+    text-align: center;
+    margin-top: 18px;
+}
+
+.boton {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 5px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+.btn_agregar {
+    background-color: #20bf6b;
+}
+
+.btn_modificar {
+    background-color: #3867d6;
+}
+
+.btn_eliminar {
+    background-color: #eb3b5a;
+}
+
+.btn_limpiar {
+    background-color: #8854d0;
+}
+
+.boton:hover {
+    opacity: 0.85;
+}
+
+.listado select {
+    height: 160px;
+    margin-top: 10px;
+}
+
+.imagen-principal {
+    display: block;
+    max-width: 350px;
+    width: 80%;
+    margin: 20px auto;
+}
+
+.mensaje {
+    text-align: center;
+    font-weight: bold;
+    color: #555555;
+}
+
+@media (max-width: 600px) {
+    .campos {
+        grid-template-columns: 1fr;
+    }
+}
