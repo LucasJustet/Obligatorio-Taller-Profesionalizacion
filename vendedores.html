@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendedores</title>
+    <link rel="stylesheet" href="./css/estilos.css">
+</head>
+<body onload="CargarDatosVendedores()">
+    <header class="encabezado">
+        <h1>Juguetería El Osito</h1>
+        <nav class="menu">
+            <a href="./principal.html">Principal</a>
+            <a href="./juguetes.html">Juguetes</a>
+            <a href="./ventas.html">Ventas</a>
+        </nav>
+    </header>
+
+    <main class="contenedor">
+        <section class="tarjeta">
+            <h2 class="titulo">ABM Vendedores</h2>
+
+            <form>
+                <div class="campos">
+                    <label for="codigo">Código:</label>
+                    <input type="text" id="codigo">
+
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre">
+
+                    <label for="cedula">Cédula:</label>
+                    <input type="text" id="cedula">
+                </div>
+
+                <div class="botones">
+                    <input class="boton btn_agregar" type="button" value="Agregar" onclick="AgregarVendedor()">
+                    <input class="boton btn_modificar" type="button" value="Modificar" onclick="ModificarVendedor()">
+                    <input class="boton btn_eliminar" type="button" value="Eliminar" onclick="EliminarVendedor()">
+                    <input class="boton btn_limpiar" type="button" value="Limpiar" onclick="InicializarVendedor()">
+                </div>
+            </form>
+        </section>
+
+        <section class="tarjeta listado">
+            <h2 class="titulo">Listado de vendedores</h2>
+            <select id="lista-vendedores" onchange="SeleccionarVendedor()" size="6"></select>
+        </section>
+    </main>
+
+    <script src="./dominio/vendedor.js"></script>
+    <script src="./dominio/memoria.js"></script>
+    <script src="./dominio/jugueteria.js"></script>
+</body>
+</html>

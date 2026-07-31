@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas</title>
+    <link rel="stylesheet" href="./css/estilos.css">
+</head>
+<body onload="CargarDatosVentas()">
+    <header class="encabezado">
+        <h1>Juguetería El Osito</h1>
+        <nav class="menu">
+            <a href="./principal.html">Principal</a>
+            <a href="./juguetes.html">Juguetes</a>
+            <a href="./vendedores.html">Vendedores</a>
+        </nav>
+    </header>
+
+    <main class="contenedor">
+        <section class="tarjeta">
+            <h2 class="titulo">Registro de ventas</h2>
+
+            <form>
+                <div class="campos">
+                    <label for="codigoVenta">Código venta:</label>
+                    <input type="text" id="codigoVenta" disabled>
+
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha">
+
+                    <label for="vendedor">Vendedor:</label>
+                    <select id="vendedor"></select>
+
+                    <label for="juguete">Juguete:</label>
+                    <select id="juguete" onchange="CalcularTotal()"></select>
+
+                    <label for="cantidad">Cantidad:</label>
+                    <input type="number" id="cantidad" min="1" oninput="CalcularTotal()">
+
+                    <label for="total">Total:</label>
+                    <input type="text" id="total" disabled>
+                </div>
+
+                <div class="botones">
+                    <input class="boton btn_agregar" type="button" value="Agregar" onclick="AgregarVenta()">
+                    <input class="boton btn_modificar" type="button" value="Modificar" onclick="ModificarVenta()">
+                    <input class="boton btn_eliminar" type="button" value="Eliminar" onclick="EliminarVenta()">
+                    <input class="boton btn_limpiar" type="button" value="Limpiar" onclick="InicializarVenta()">
+                </div>
+            </form>
+        </section>
+
+        <section class="tarjeta listado">
+            <h2 class="titulo">Listado de ventas</h2>
+            <select id="lista-ventas" onchange="SeleccionarVenta()" size="6"></select>
+        </section>
+    </main>
+
+    <script src="./dominio/juguete.js"></script>
+    <script src="./dominio/vendedor.js"></script>
+    <script src="./dominio/venta.js"></script>
+    <script src="./dominio/memoria.js"></script>
+    <script src="./dominio/jugueteria.js"></script>
+</body>
+</html>
