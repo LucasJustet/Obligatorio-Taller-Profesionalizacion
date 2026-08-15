@@ -3,33 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juguetería El Osito</title>
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-   <link rel="stylesheet" href="./css/estilos.css">
+    <title>Dashboard - Juguetería El Osito</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #93c5fd 100%);
+            min-height: 100vh;
+        }
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid #ffc107 !important;
+            outline-offset: 2px !important;
+        }
+    </style>
 </head>
-<body>
-    <header class="encabezado">
-        <h1>Juguetería El Osito</h1>
-        <nav class="menu">
-    <a href="./views/juguetes.html">Juguetes</a>
-    <a href="./views/vendedores.html">Vendedores</a>
-    <a href="./views/ventas.html">Ventas</a>
-</nav>
+<body class="text-dark d-flex flex-column">
 
-    </header>
-
-    <main class="contenedor">
-        <section class="tarjeta">
-            <h2 class="titulo">Sistema de gestión</h2>
-            <p class="mensaje">
-                Ejemplo básico con HTML, CSS, JavaScript y persistencia en localStorage.
-            </p>
-            <img class="imagen-principal" src="https://papeleriajarquehnos.com.uy/wp-content/uploads/2019/05/toys.png" alt="Juguetes">
-            <p>
-                Desde este menú se pueden cargar juguetes, vendedores y ventas. Los datos quedan guardados en el navegador usando localStorage.
-            </p>
+   
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm" role="navigation" aria-label="Navegación principal">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="./index.html">
+                <span class="fs-4" aria-hidden="true">🧸</span> 
+                <span>Juguetería El Osito</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar menú de navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav gap-1 text-end text-lg-start">
+                    <li class="nav-item">
+                        <a class="nav-link active bg-primary text-white rounded px-3 py-2 fw-semibold" href="./index.html" aria-current="page">
+                            <i class="bi bi-box-seam me-1" aria-hidden="true"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./views/juguetes.html">
+                            <i class="bi bi-controller me-1" aria-hidden="true"></i> Juguetes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./views/vendedores.html">
+                            <i class="bi bi-people me-1" aria-hidden="true"></i> Vendedores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./views/ventas.html">
+                            <i class="bi bi-cart-check me-1" aria-hidden="true"></i> Ventas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="container-fluid px-4 py-4 flex-grow-1" id="contenido-principal">
+        
+        <section class="p-4 p-md-5 mb-5 rounded-4 bg-white shadow-lg border-top border-warning border-5 text-center text-md-start" aria-labelledby="titulo-bienvenida">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 id="titulo-bienvenida" class="display-5 fw-bold text-primary mb-3">¡Bienvenido a Juguetería El Osito! 🚂✨</h1>
+                    <p class="lead text-secondary mb-0">Gestiona de forma rápida, eficiente y organizada el inventario de juguetes, controla el equipo de ventas y consulta las existencias disponibles.</p>
+                </div>
+                <div class="col-md-4 text-center mt-4 mt-md-0" aria-hidden="true">
+                    <span class="display-1">🧸🚀🎨</span>
+                </div>
+            </div>
         </section>
+        <section class="row g-4 mb-5" aria-label="Accesos rápidos del sistema">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 rounded-4 p-4 bg-white h-100 border-top border-primary border-4 text-center d-flex flex-column">
+                    <div class="fs-1 text-primary mb-2" aria-hidden="true">🧩</div>
+                    <h2 class="h5 fw-bold text-dark">Gestión de Juguetes</h2>
+                    <p class="text-secondary small mb-3">Administra el catálogo general, actualiza precios, códigos y verifica el stock disponible.</p>
+                    <a href="./views/juguetes.html" class="btn btn-outline-primary fw-semibold btn-sm mt-auto shadow-sm">Ir a Juguetes</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 rounded-4 p-4 bg-white h-100 border-top border-success border-4 text-center d-flex flex-column">
+                    <div class="fs-1 text-success mb-2" aria-hidden="true">🧑‍💼</div>
+                    <h2 class="h5 fw-bold text-dark">Control de Vendedores</h2>
+                    <p class="text-secondary small mb-3">Registra, edita y administra la información del personal encargado de las operaciones.</p>
+                    <a href="./views/vendedores.html" class="btn btn-outline-success fw-semibold btn-sm mt-auto shadow-sm">Ir a Vendedores</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 rounded-4 p-4 bg-white h-100 border-top border-warning border-4 text-center d-flex flex-column">
+                    <div class="fs-1 text-warning mb-2" aria-hidden="true">🛒</div>
+                    <h2 class="h5 fw-bold text-dark">Registro de Ventas</h2>
+                    <p class="text-secondary small mb-3">Efectúa cobros, vincula transacciones de juguetes con vendedores y lleva el control diario.</p>
+                    <a href="./views/ventas.html" class="btn btn-outline-warning text-dark fw-semibold btn-sm mt-auto shadow-sm">Ir a Ventas</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-4" aria-labelledby="titulo-catalogo">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                <h2 id="titulo-catalogo" class="h4 fw-bold text-white mb-0">
+                    <i class="bi bi-star-fill text-warning me-2" aria-hidden="true"></i>Catálogo Destacado de Juguetes
+                </h2>
+                <span class="badge bg-light text-dark px-3 py-2 shadow-sm fw-bold">Actualizado en vivo</span>
+            </div>
+            <div id="catalogo-destacado" class="row g-4">
+            </div>
+        </section>
+
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import './src/app.js';
+    </script>
 </body>
 </html>

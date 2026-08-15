@@ -3,99 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendedores</title>
-
-    <link rel="stylesheet" href="../css/estilos.css">
+    <title>Vendedores - Juguetería El Osito</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #93c5fd 100%);
+            min-height: 100vh;
+        }
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid #ffc107 !important;
+            outline-offset: 2px !important;
+        }
+    </style>
 </head>
+<body class="text-dark d-flex flex-column">
 
-<body onload="CargarDatosVendedores()">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm" role="navigation" aria-label="Navegación principal">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="../index.html">
+                <span class="fs-4" aria-hidden="true">🧸</span> Juguetería El Osito
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="../index.html">
+                            <i class="bi bi-box-seam me-1" aria-hidden="true"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./juguetes.html">
+                            <i class="bi bi-controller me-1" aria-hidden="true"></i> Juguetes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active bg-primary text-white rounded px-3 py-2 fw-semibold" href="./vendedores.html" aria-current="page">
+                            <i class="bi bi-people me-1" aria-hidden="true"></i> Vendedores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./ventas.html">
+                            <i class="bi bi-cart-check me-1" aria-hidden="true"></i> Ventas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <header class="encabezado">
-        <h1>Juguetería El Osito</h1>
+    <main class="container-fluid px-4 py-4 flex-grow-1" id="contenido-principal">
+        
+        <div class="mb-4">
+            <h1 class="h4 fw-bold text-white mb-1 shadow-sm">Gestión de Vendedores</h1>
+            <p class="text-white fs-6 mb-0 opacity-75">Administra el personal encargado de las operaciones y ventas del sistema.</p>
+        </div>
 
-        <nav class="menu">
-            <a href="../index.html">Principal</a>
-            <a href="./juguetes.html">Juguetes</a>
-            <a href="./ventas.html">Ventas</a>
-        </nav>
-    </header>
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card shadow border-0 rounded-4 p-4 bg-white bg-opacity-95 h-100 border-top border-primary border-4">
+                    <h2 class="h5 text-primary fw-bold mb-3 pb-2 border-bottom">
+                        <i class="bi bi-person-badge me-2" aria-hidden="true"></i>Registro Vendedores
+                    </h2>
 
+                    <form id="form-vendedor" novalidate>
+                        <div class="mb-3">
+                            <label for="codigo" class="form-label fw-bold small text-secondary">Código:</label>
+                            <input type="text" class="form-control py-2 bg-light" id="codigo" placeholder="Ej: V01" aria-describedby="codigoVendedorFeedback">
+                            <div id="codigoVendedorFeedback" class="invalid-feedback">❌ Código inválido u ocupado.</div>
+                            <div class="valid-feedback">✅ Código correcto.</div>
+                        </div>
 
-    <main class="contenedor">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label fw-bold small text-secondary">Nombre:</label>
+                            <input type="text" class="form-control py-2 bg-light" id="nombre" placeholder="Ej: Carlos Gómez" aria-describedby="nombreVendedorFeedback">
+                            <div id="nombreVendedorFeedback" class="invalid-feedback">❌ Ingrese un nombre válido.</div>
+                            <div class="valid-feedback">✅ Nombre correcto.</div>
+                        </div>
 
-        <section class="tarjeta">
+                        <div class="mb-3">
+                            <label for="cedula" class="form-label fw-bold small text-secondary">Cédula:</label>
+                            <input type="text" class="form-control py-2 bg-light" id="cedula" placeholder="Ej: 1.234.567-8" aria-describedby="cedulaFeedback">
+                            <div id="cedulaFeedback" class="invalid-feedback">❌ Cédula incorrecta.</div>
+                            <div class="valid-feedback">✅ Cédula válida.</div>
+                        </div>
 
-            <h2 class="titulo">ABM Vendedores</h2>
-
-            <form>
-
-                <div class="campos">
-
-                    <label for="codigo">Código:</label>
-                    <input type="text" id="codigo">
-
-
-                    <label for="nombre">Nombre:</label>
-                    <input type="text" id="nombre">
-
-
-                    <label for="cedula">Cédula:</label>
-                    <input type="text" id="cedula">
-
+                        <div class="d-flex flex-wrap gap-2 justify-content-between mt-4 pt-3 border-top">
+                            <button type="button" class="btn btn-success fw-bold px-3 py-2 flex-grow-1 shadow-sm" id="btn-agregar">
+                                <span aria-hidden="true">➕</span> Agregar
+                            </button>
+                            <button type="button" class="btn btn-primary fw-bold px-3 py-2 flex-grow-1 shadow-sm" id="btn-modificar">
+                                <span aria-hidden="true">✏️</span> Modificar
+                            </button>
+                            <button type="button" class="btn btn-danger fw-bold px-3 py-2 flex-grow-1 shadow-sm" id="btn-eliminar">
+                                <span aria-hidden="true">🗑️</span> Eliminar
+                            </button>
+                            <button type="button" class="btn btn-secondary fw-bold px-3 py-2 w-100 shadow-sm" id="btn-limpiar">
+                                <span aria-hidden="true">🧹</span> Limpiar Formulario
+                            </button>
+                        </div>
+                    </form>
                 </div>
+            </div>
 
+            <div class="col-lg-7">
+                <div class="card shadow border-0 rounded-4 p-4 bg-white bg-opacity-95 h-100 d-flex flex-column border-top border-secondary border-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h2 class="h5 fw-bold text-secondary mb-0">Listado de Vendedores</h2>
+                        <span class="badge bg-primary text-white px-3 py-1 shadow-sm">Sistema Local</span>
+                    </div>
 
-                <div class="botones">
+                    <div class="mb-3 flex-grow-1 d-flex flex-column">
+                        <label for="lista-vendedores" class="form-label small text-muted fw-bold">Seleccione un elemento de la lista para editar o eliminar:</label>
+                        <select id="lista-vendedores" class="form-select font-monospace flex-grow-1 shadow-sm bg-light" size="10" aria-label="Listado de vendedores registrados" style="min-height: 280px;"></select>
+                    </div>
 
-                    <input class="boton btn_agregar"
-                    type="button"
-                    value="Agregar"
-                    onclick="AgregarVendedor()">
-
-
-                    <input class="boton btn_modificar"
-                    type="button"
-                    value="Modificar"
-                    onclick="ModificarVendedor()">
-
-
-                    <input class="boton btn_eliminar"
-                    type="button"
-                    value="Eliminar"
-                    onclick="EliminarVendedor()">
-
-
-                    <input class="boton btn_limpiar"
-                    type="button"
-                    value="Limpiar"
-                    onclick="InicializarVendedor()">
-
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted" aria-hidden="true"></i></span>
+                        <input type="text" id="buscador-vendedores" class="form-control border-start-0 ps-0 py-2 bg-light" placeholder="Buscar vendedor..." aria-label="Buscar vendedores">
+                    </div>
                 </div>
-
-            </form>
-
-        </section>
-
-
-        <section class="tarjeta listado">
-
-            <h2 class="titulo">Listado de vendedores</h2>
-
-            <select id="lista-vendedores"
-                    onchange="SeleccionarVendedor()"
-                    size="6">
-            </select>
-
-        </section>
-
+            </div>
+        </div>
     </main>
 
-
-   
-    <script src="../dominio/models/vendedor.js"></script>
-    <script src="../dominio/services/storage.js"></script>
-    <script src="../dominio/services/ui.js"></script>
-    <script src="../dominio/controllers/vendedorController.js"></script>
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import '../src/app.js';
+        import { VendedorController } from '../src/controllers/vendedorController.js';
+        new VendedorController();
+    </script>
 </body>
 </html>
