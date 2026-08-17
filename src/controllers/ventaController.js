@@ -29,6 +29,7 @@ export class VentaController {
             this.calcularTotal();
         });
 
+        document.getElementById('buscador-ventas')?.addEventListener('input', (e) => this.filtrarLista(e.target.value));
         this.cargarSelects();
         this.inicializarFormulario();
         this.listar();
@@ -97,6 +98,7 @@ export class VentaController {
         if (txtTotal) txtTotal.value = '0.00';
 
         this.calcularTotal();
+        this.listar(); // Recarga la lista completa por si había filtro activo
     }
 
     validarFecha() {
@@ -179,7 +181,6 @@ export class VentaController {
         UIService.mostrarNotificacion('¡Venta registrada con éxito!', 'success');
         this.cargarSelects(); 
         this.inicializarFormulario();
-        this.listar();
     }
 
     seleccionar() {
@@ -253,7 +254,6 @@ export class VentaController {
         UIService.mostrarNotificacion('¡Venta modificada con éxito!', 'success');
         this.cargarSelects();
         this.inicializarFormulario();
-        this.listar();
     }
 
     eliminar() {
@@ -276,19 +276,42 @@ export class VentaController {
         UIService.mostrarNotificacion('¡Venta eliminada correctamente!', 'success');
         this.cargarSelects();
         this.inicializarFormulario();
-        this.listar();
     }
 
-    listar() {
+    listar(ventasFiltradas = null) {
         const lista = document.getElementById('lista-ventas');
         if (!lista) return;
         lista.innerHTML = '';
-        for (let venta of this.ventaRepo.todos()) {
+        
+        const datos = ventasFiltradas || this.ventaRepo.todos();
+        for (let venta of datos) {
             let vendedorNombre = venta.vendedor?.nombre || 'Desconocido';
             let jugueteNombre = venta.juguete?.nombre || 'Desconocido';
             let total = venta.total || (venta.juguete?.precio * venta.cantidad) || 0;
             let texto = `Venta #${venta.codigo} | ${venta.fecha} - ${vendedorNombre} - ${jugueteNombre} (Cant: ${venta.cantidad}) - Total: $${total}`;
             lista.add(new Option(texto, venta.codigo));
         }
+    }
+
+    filtrarLista(filtro) {
+        const texto = filtro.toLowerCase().trim();
+        const todos = this.ventaRepo.todos();
+        
+        const filtrados = todos.filter(venta => {
+            let vendedorNombre = venta.vendedor?.nombre || '';
+            let jugueteNombre = venta.juguete?.nombre || '';
+            let total = String(venta.total || (venta.juguete?.precio * venta.cantidad) || 0);
+
+            return (
+                String(venta.codigo).toLowerCase().includes(texto) ||
+                String(venta.fecha).toLowerCase().includes(texto) ||
+                vendedorNombre.toLowerCase().includes(texto) ||
+                jugueteNombre.toLowerCase().includes(texto) ||
+                String(venta.cantidad).toLowerCase().includes(texto) ||
+                total.toLowerCase().includes(texto)
+            );
+        });
+
+        this.listar(filtrados);
     }
 }

@@ -19,6 +19,7 @@ export class JugueteController {
         document.getElementById('nombre')?.addEventListener('input', () => this.validarNombre());
         document.getElementById('precio')?.addEventListener('input', () => this.validarPrecio());
         document.getElementById('stock')?.addEventListener('input', () => this.validarStock());
+        document.getElementById('buscador')?.addEventListener('input', (e) => this.filtrarLista(e.target.value));
 
         this.inicializarFormulario();
         this.listar();
@@ -29,6 +30,7 @@ export class JugueteController {
         const txtNombre = document.getElementById('nombre');
         const txtPrecio = document.getElementById('precio');
         const txtStock = document.getElementById('stock');
+        const buscador = document.getElementById('buscador');
         const form = document.getElementById('form-juguete') || document.querySelector('form');
 
         if (form) UIService.limpiarErrores(form);
@@ -37,6 +39,8 @@ export class JugueteController {
         if (txtNombre) txtNombre.value = '';
         if (txtPrecio) txtPrecio.value = '';
         if (txtStock) txtStock.value = '';
+        if (buscador) buscador.value = ''; 
+        this.listar(); 
     }
 
     validarCodigo() {
@@ -55,7 +59,6 @@ export class JugueteController {
         const txtNombre = document.getElementById('nombre');
         const valor = txtNombre?.value.trim();
         
-        // No vacío y no compuesto únicamente por números
         if (!valor || /^\d+$/.test(valor)) {
             UIService.marcarInvalido(txtNombre, '❌ El nombre no puede ser solo números ni estar vacío.');
             return false;
@@ -116,7 +119,6 @@ export class JugueteController {
         this.repo.guardar(juguete);
         UIService.mostrarNotificacion('¡Juguete agregado con éxito!', 'success');
         this.inicializarFormulario();
-        this.listar();
     }
 
     seleccionar() {
@@ -165,7 +167,6 @@ export class JugueteController {
         
         UIService.mostrarNotificacion('¡Juguete modificado con éxito!', 'success');
         this.inicializarFormulario();
-        this.listar();
     }
 
     eliminar() {
@@ -177,16 +178,31 @@ export class JugueteController {
         this.repo.eliminar(codigo);
         UIService.mostrarNotificacion('¡Juguete eliminado correctamente!', 'success');
         this.inicializarFormulario();
-        this.listar();
     }
 
-    listar() {
+    listar(juguetesFiltrados = null) {
         const lista = document.getElementById('lista-juguetes');
         if (!lista) return;
         lista.innerHTML = '';
-        for (let juguete of this.repo.todos()) {
+        
+        const datos = juguetesFiltrados || this.repo.todos();
+        for (let juguete of datos) {
             let texto = `${juguete.codigo} - ${juguete.nombre} - $${juguete.precio} - Stock: ${juguete.stock}`;
             lista.add(new Option(texto, juguete.codigo));
         }
+    }
+
+    filtrarLista(filtro) {
+        const texto = filtro.toLowerCase().trim();
+        const todos = this.repo.todos();
+        
+        const filtrados = todos.filter(j => 
+            j.codigo.toLowerCase().includes(texto) || 
+            j.nombre.toLowerCase().includes(texto) || 
+            String(j.precio).toLowerCase().includes(texto) ||
+            String(j.stock).toLowerCase().includes(texto)
+        );
+
+        this.listar(filtrados);
     }
 }

@@ -18,7 +18,16 @@ export class VendedorController {
         // --- VALIDACIÓN EN TIEMPO REAL ---
         document.getElementById('codigo')?.addEventListener('input', () => this.validarCodigo());
         document.getElementById('nombre')?.addEventListener('input', () => this.validarNombre());
-        document.getElementById('cedula')?.addEventListener('input', () => this.validarCedula());
+        
+     
+        const inputCedula = document.getElementById('cedula');
+        if (inputCedula) {
+            inputCedula.addEventListener('input', (e) => {
+                this.aplicarFormatoCedula(e);
+                this.validarCedula();
+            });
+        }
+        document.getElementById('buscador-vendedores')?.addEventListener('input', (e) => this.filtrarLista(e.target.value));
 
         this.inicializarFormulario();
         this.listar();
@@ -35,6 +44,8 @@ export class VendedorController {
         if (txtCodigo) { txtCodigo.value = ''; txtCodigo.disabled = false; txtCodigo.focus(); }
         if (txtNombre) txtNombre.value = '';
         if (txtCedula) txtCedula.value = '';
+        
+        this.listar(); 
     }
 
     validarCodigo() {
@@ -52,10 +63,10 @@ export class VendedorController {
     validarNombre() {
         const txtNombre = document.getElementById('nombre');
         const valor = txtNombre?.value.trim();
-        
-        // No puede estar vacío y NO puede ser puramente numérico
-        if (!valor || /^\d+$/.test(valor)) {
-            UIService.marcarInvalido(txtNombre, '❌ El nombre no puede ser solo números ni estar vacío.');
+        const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+
+        if (!valor || !regexNombre.test(valor)) {
+            UIService.marcarInvalido(txtNombre, '❌ El nombre solo debe contener letras y no puede estar vacío.');
             return false;
         } else {
             UIService.marcarValido(txtNombre, '✅ Nombre correcto.');
@@ -63,13 +74,32 @@ export class VendedorController {
         }
     }
 
+    aplicarFormatoCedula(e) {
+        let valor = e.target.value.replace(/\D/g, ''); 
+        if (valor.length > 8) valor = valor.slice(0, 8); 
+
+        let formateado = '';
+        if (valor.length > 0) {
+            if (valor.length <= 3) {
+                formateado = valor;
+            } else if (valor.length <= 6) {
+                formateado = `${valor.slice(0, 1)}.${valor.slice(1)}`;
+            } else if (valor.length <= 7) {
+                formateado = `${valor.slice(0, 1)}.${valor.slice(1, 4)}.${valor.slice(4)}`;
+            } else {
+                formateado = `${valor.slice(0, 1)}.${valor.slice(1, 4)}.${valor.slice(4, 7)}-${valor.slice(7)}`;
+            }
+        }
+        e.target.value = formateado;
+    }
+
     validarCedula() {
         const txtCedula = document.getElementById('cedula');
         const valor = txtCedula?.value.trim();
-        const regexCedula = /^\d{8}$/; // Exactamente 8 dígitos numéricos
+        const regexCedula = /^\d\.\d{3}\.\d{3}-\d$/; 
 
         if (!regexCedula.test(valor)) {
-            UIService.marcarInvalido(txtCedula, '❌ La cédula debe tener exactamente 8 dígitos numéricos.');
+            UIService.marcarInvalido(txtCedula, '❌ La cédula debe tener el formato 1.234.567-8.');
             return false;
         } else {
             UIService.marcarValido(txtCedula, '✅ Cédula válida.');
@@ -102,7 +132,6 @@ export class VendedorController {
         this.repo.guardar(vendedor);
         UIService.mostrarNotificacion('¡Vendedor agregado con éxito!', 'success');
         this.inicializarFormulario();
-        this.listar();
     }
 
     seleccionar() {
@@ -146,7 +175,6 @@ export class VendedorController {
         
         UIService.mostrarNotificacion('¡Vendedor modificado con éxito!', 'success');
         this.inicializarFormulario();
-        this.listar();
     }
 
     eliminar() {
@@ -158,16 +186,30 @@ export class VendedorController {
         this.repo.eliminar(codigo);
         UIService.mostrarNotificacion('¡Vendedor eliminado correctamente!', 'success');
         this.inicializarFormulario();
-        this.listar();
     }
 
-    listar() {
+    listar(vendedoresFiltrados = null) {
         const lista = document.getElementById('lista-vendedores');
         if (!lista) return;
         lista.innerHTML = '';
-        for (let vendedor of this.repo.todos()) {
+        
+        const datos = vendedoresFiltrados || this.repo.todos();
+        for (let vendedor of datos) {
             let texto = `${vendedor.codigo} - ${vendedor.nombre} - CI: ${vendedor.cedula}`;
             lista.add(new Option(texto, vendedor.codigo));
         }
+    }
+
+    filtrarLista(filtro) {
+        const texto = filtro.toLowerCase().trim();
+        const todos = this.repo.todos();
+        
+        const filtrados = todos.filter(v => 
+            v.codigo.toLowerCase().includes(texto) || 
+            v.nombre.toLowerCase().includes(texto) || 
+            v.cedula.toLowerCase().includes(texto)
+        );
+
+        this.listar(filtrados);
     }
 }
