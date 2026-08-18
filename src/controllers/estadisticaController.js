@@ -2,55 +2,96 @@ import { LocalStorageRepository } from '../repository/LocalStorageRepository.js'
 
 export class EstadisticaController {
     constructor() {
-        this.ventaRepo = new LocalStorageRepository('ventas');
-        this.jugueteRepo = new LocalStorageRepository('juguetes');
-        this.vendedorRepo = new LocalStorageRepository('vendedores');
-        this.container = document.getElementById('contenedor-stats');
+        this.repoVentas = new LocalStorageRepository('ventas');
+        this.repoJuguetes = new LocalStorageRepository('juguetes');
+        this.repoVendedores = new LocalStorageRepository('vendedores');
+
         this.init();
     }
 
     init() {
-        this.calcularEstadisticas();
-        const btn = document.getElementById('btn-actualizar-stats');
-        btn?.addEventListener('click', () => this.calcularEstadisticas());
+        this.calcularYRenderizar();
+
+        const btnActualizar = document.getElementById('btn-actualizar-stats');
+        btnActualizar?.addEventListener('click', () => {
+            this.calcularYRenderizar();
+        });
     }
 
-    calcularEstadisticas() {
-        if (this.container) this.container.setAttribute('aria-busy', 'true');
-
-        try {
-            const ventas = this.ventaRepo.todos();
-            const juguetes = this.jugueteRepo.todos();
-            const vendedores = this.vendedorRepo.todos();
-
-            const ingresos = ventas.reduce((acc, v) => {
-                const total = v.total || (v.juguete?.precio * v.cantidad) || 0;
-                return acc + Number(total);
-            }, 0);
-
-            this.actualizarTexto('stat-ingresos', `$${ingresos.toFixed(2)}`);
-            this.actualizarTexto('stat-ventas', ventas.length);
-            this.actualizarTexto('stat-stock', juguetes.reduce((acc, j) => acc + Number(j.stock || 0), 0));
-            this.actualizarTexto('stat-juguetes', juguetes.length);
-            this.actualizarTexto('stat-vendedores', vendedores.length);
-            
-        } catch (error) {
-            console.error("Error al calcular estadísticas:", error);
-        } finally {
-       
-            if (this.container) this.container.setAttribute('aria-busy', 'false');
+    /**
+     * Extrae de forma limpia el nombre aunque venga como objeto o string
+     */
+    obtenerNombreLimpio(valor) {
+        if (!valor) return 'Desconocido';
+        if (typeof valor === 'string') return valor;
+        if (typeof valor === 'object') {
+            return valor.nombre || valor.nombreVendedor || valor.nombreJuguete || valor.codigo || 'Desconocido';
         }
+        return String(valor);
     }
 
-    actualizarTexto(id, valor) {
-        const elemento = document.getElementById(id);
-        if (elemento) {
-            elemento.style.transition = "opacity 0.3s";
-            elemento.style.opacity = "0";
-            setTimeout(() => {
-                elemento.textContent = valor;
-                elemento.style.opacity = "1";
-            }, 150);
-        }
+    calcularYRenderizar() {
+        const ventas = this.repoVentas.todos();
+        const juguetes = this.repoJuguetes.todos();
+        const vendedores = this.repoVendedores.todos();
+        const totalVentas = ventas.length;
+        const totalIngresos = ventas.reduce((acc, v) => acc + (Number(v.total) || Number(v.precio) || 0), 0);
+        const stockTotal = juguetes.reduce((acc, j) => acc + (Number(j.stock) || 0), 0);
+        const ticketPromedio = totalVentas > 0 ? (totalIngresos / totalVentas) : 0;
+        const ventasPorVendedor = {};
+        const ingresosPorVendedor = {};
+
+        ventas.forEach(v => {
+            const vNombre = this.obtenerNombreLimpio(v.vendedorNombre || v.vendedor);
+            ventasPorVendedor[vNombre] = (ventasPorVendedor[vNombre] || 0) + 1;
+            ingresosPorVendedor[vNombre] = (ingresosPorVendedor[vNombre] || 0) + (Number(v.total) || Number(v.precio) || 0);
+        });
+
+        let topVendedor = 'Sin ventas';
+        let topVendedorInfo = 'Aún no hay ventas registradas';
+        let maxVentasVend = 0;
+
+        Object.keys(ventasPorVendedor).forEach(nombre => {
+            if (ventasPorVendedor[nombre] > maxVentasVend) {
+                maxVentasVend = ventasPorVendedor[nombre];
+                topVendedor = nombre;
+                topVendedorInfo = `${maxVentasVend} ventas ($${ingresosPorVendedor[nombre].toLocaleString('es-UY')})`;
+            }
+        });
+        const ventasPorJuguete = {};
+
+        ventas.forEach(v => {
+            const jNombre = this.obtenerNombreLimpio(v.jugueteNombre || v.juguete);
+            const cantidad = Number(v.cantidad) || 1;
+            ventasPorJuguete[jNombre] = (ventasPorJuguete[jNombre] || 0) + cantidad;
+        });
+
+        let topJuguete = 'Sin ventas';
+        let topJugueteInfo = 'Aún no hay ventas registradas';
+        let maxCantJuguete = 0;
+
+        Object.keys(ventasPorJuguete).forEach(nombre => {
+            if (ventasPorJuguete[nombre] > maxCantJuguete) {
+                maxCantJuguete = ventasPorJuguete[nombre];
+                topJuguete = nombre;
+                topJugueteInfo = `${maxCantJuguete} unid. vendida${maxCantJuguete > 1 ? 's' : ''}`;
+            }
+        });
+        this.setTexto('stat-ingresos', `$${totalIngresos.toLocaleString('es-UY', { minimumFractionDigits: 2 })}`);
+        this.setTexto('stat-ventas', totalVentas);
+        this.setTexto('stat-stock', stockTotal);
+        this.setTexto('stat-juguetes', juguetes.length);
+        this.setTexto('stat-vendedores', vendedores.length);
+
+        this.setTexto('stat-ticket-promedio', `$${ticketPromedio.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+        this.setTexto('stat-top-vendedor', topVendedor);
+        this.setTexto('stat-top-vendedor-info', topVendedorInfo);
+        this.setTexto('stat-top-juguete', topJuguete);
+        this.setTexto('stat-top-juguete-info', topJugueteInfo);
+    }
+
+    setTexto(id, valor) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = valor;
     }
 }

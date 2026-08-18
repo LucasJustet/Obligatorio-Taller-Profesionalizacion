@@ -78,14 +78,13 @@
                 <h2 id="titulo-catalogo" class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider">
                     <i class="bi bi-star-fill text-warning me-2" aria-hidden="true"></i>Catálogo Destacado
                 </h2>
-                <span class="badge bg-light text-dark px-2 py-1 shadow-sm fw-bold" style="font-size: 0.75rem;">Actualizado en vivo</span>
             </div>
 
             <div class="row g-2 mb-3">
                 <div class="col-md-8">
                     <div class="input-group shadow-sm">
                         <span class="input-group-text bg-white border-0"><i class="bi bi-search" aria-hidden="true"></i></span>
-                        <input type="text" id="input-buscar-index" class="form-control border-0 py-2" placeholder="Buscar por nombre o código..." aria-label="Buscar juguete destacado">
+                        <input type="text" id="input-buscar-index" class="form-control border-0 py-2" placeholder="Buscar por nombre, código o precio..." aria-label="Buscar juguete destacado">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -99,40 +98,6 @@
 
             <div id="carrusel-catalogo" class="carousel slide position-relative px-md-5" data-bs-ride="false" aria-label="Juguetes destacados">
                 <div class="carousel-inner" id="catalogo-destacado">
-                    <div class="carousel-item active">
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <div class="card shadow border-0 rounded-4 p-4 bg-white h-100 border-top border-warning border-4 text-center d-flex flex-column">
-                                    <div class="display-4 mb-2">🧸</div>
-                                    <span class="badge bg-primary align-self-center mb-2 font-monospace">Código: J1</span>
-                                    <h3 class="h5 fw-bold text-dark">Oso de Peluche Gigante</h3>
-                                    <p class="text-success fw-bold fs-4 mb-1">$850</p>
-                                    <p class="text-secondary small mb-3">Stock: <strong>10</strong> u.</p>
-                                    <a href="./views/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm"><i class="bi bi-cart-plus me-1"></i> Comprar</a>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card shadow border-0 rounded-4 p-4 bg-white h-100 border-top border-warning border-4 text-center d-flex flex-column">
-                                    <div class="display-4 mb-2">🏎️</div>
-                                    <span class="badge bg-primary align-self-center mb-2 font-monospace">Código: J2</span>
-                                    <h3 class="h5 fw-bold text-dark">Auto a Control Remoto</h3>
-                                    <p class="text-success fw-bold fs-4 mb-1">$1200</p>
-                                    <p class="text-secondary small mb-3">Stock: <strong>5</strong> u.</p>
-                                    <a href="./views/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm"><i class="bi bi-cart-plus me-1"></i> Comprar</a>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card shadow border-0 rounded-4 p-4 bg-white h-100 border-top border-warning border-4 text-center d-flex flex-column">
-                                    <div class="display-4 mb-2">🧩</div>
-                                    <span class="badge bg-primary align-self-center mb-2 font-monospace">Código: J3</span>
-                                    <h3 class="h5 fw-bold text-dark">Rompecabezas</h3>
-                                    <p class="text-success fw-bold fs-4 mb-1">$450</p>
-                                    <p class="text-secondary small mb-3">Stock: <strong>20</strong> u.</p>
-                                    <a href="./views/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm"><i class="bi bi-cart-plus me-1"></i> Comprar</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <button class="carousel-control-prev w-auto position-absolute top-50 start-0 translate-middle-y z-3 border-0 bg-transparent" type="button" data-bs-target="#carrusel-catalogo" data-bs-slide="prev" aria-label="Anterior">
                     <span class="btn-carrusel-control" aria-hidden="true"><i class="bi bi-chevron-left fs-5"></i></span>
@@ -148,7 +113,6 @@
     <script type="module">
         import { App } from './src/app.js';
         import { ApiService } from './src/services/api.js';
-        import { LocalStorageRepository } from './src/repository/LocalStorageRepository.js';
 
         async function cargarClima() {
             const sel = document.getElementById('select-ciudad');
@@ -159,62 +123,20 @@
             info.innerHTML = d ? `${d.nombre}: <strong>${d.temp}°C</strong>. Viento ${d.viento} km/h` : '❌ Error al cargar.';
         }
 
-        function setupFiltros() {
-            const input = document.getElementById('input-buscar-index');
-            const stockSel = document.getElementById('select-filtro-stock');
-            const repo = new LocalStorageRepository('juguetes');
-            const iconos = ['🧸', '🏎️', '🧩', '🧱', '👸', '🛤️'];
-
-            function filtrar() {
-                const term = input?.value.toLowerCase().trim() || '';
-                const filtro = stockSel?.value || 'todos';
-                let items = repo.todos();
-
-                if (term) items = items.filter(j => j.nombre.toLowerCase().includes(term) || j.codigo.toLowerCase().includes(term));
-                if (filtro === 'disponible') items = items.filter(j => Number(j.stock) > 0);
-                if (filtro === 'agotado') items = items.filter(j => Number(j.stock) <= 0);
-
-                const cont = document.getElementById('catalogo-destacado');
-                if (!cont) return;
-
-                if (!items.length) {
-                    cont.innerHTML = '<div class="carousel-item active"><p class="text-white text-center py-4">Sin resultados.</p></div>';
-                    return;
-                }
-
-                let grupos = [];
-                for (let i = 0; i < items.length; i += 3) grupos.push(items.slice(i, i + 3));
-
-                cont.innerHTML = grupos.map((g, idx) => `
-                    <div class="carousel-item ${idx === 0 ? 'active' : ''}">
-                        <div class="row g-4">
-                            ${g.map((j, i) => `
-                                <div class="col-md-4">
-                                    <div class="card shadow border-0 rounded-4 p-4 bg-white h-100 border-top border-warning border-4 text-center d-flex flex-column">
-                                        <div class="display-4 mb-2">${iconos[(i + idx * 3) % iconos.length]}</div>
-                                        <span class="badge bg-primary align-self-center mb-2 font-monospace">Código: ${j.codigo}</span>
-                                        <h3 class="h5 fw-bold text-dark">${j.nombre}</h3>
-                                        <p class="text-success fw-bold fs-4 mb-1">$${j.precio}</p>
-                                        <p class="text-secondary small mb-3">Stock: <strong>${j.stock}</strong> u.</p>
-                                        <a href="./views/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm"><i class="bi bi-cart-plus me-1"></i> Comprar</a>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            input?.addEventListener('input', filtrar);
-            stockSel?.addEventListener('change', filtrar);
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             App.init();
             cargarClima();
-            setupFiltros();
+
             document.getElementById('btn-actualizar-clima')?.addEventListener('click', cargarClima);
             document.getElementById('select-ciudad')?.addEventListener('change', cargarClima);
+
+            const inputBuscar = document.getElementById('input-buscar-index');
+            const selectStock = document.getElementById('select-filtro-stock');
+
+            const refrescarCatalogo = () => App.renderizarCatalogoDestacado();
+
+            inputBuscar?.addEventListener('input', refrescarCatalogo);
+            selectStock?.addEventListener('change', refrescarCatalogo);
         });
     </script>
 </body>
