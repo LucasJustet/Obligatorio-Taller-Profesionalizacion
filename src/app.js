@@ -28,20 +28,70 @@ export class App {
             juguetes.forEach(j => repoJuguetes.guardar(j));
         }
     }
+    static obtenerIcono(juguete) {
+        if (!juguete) return '🎁';
+        if (typeof juguete === 'string') return App.obtenerIconoPorNombre(juguete);
+        if (juguete.icono) return juguete.icono;
+
+        return App.obtenerIconoPorNombre(juguete.nombre || juguete.codigo || '');
+    }
+
+    static obtenerIconoPorNombre(nombre) {
+        const txt = (nombre || '').toLowerCase();
+
+        if (txt.includes('oso') || txt.includes('peluche') || txt.includes('j1')) return '🧸';
+        if (txt.includes('auto') || txt.includes('carro') || txt.includes('remoto') || txt.includes('j2')) return '🏎️';
+        if (txt.includes('rompecabezas') || txt.includes('juego') || txt.includes('puzzle') || txt.includes('j3')) return '🧩';
+        if (txt.includes('avion') || txt.includes('avión') || txt.includes('vuelo') || txt.includes('helicoptero')) return '✈️';
+        if (txt.includes('bloque') || txt.includes('lego') || txt.includes('construccion') || txt.includes('j4')) return '🧱';
+        if (txt.includes('muñeca') || txt.includes('princesa') || txt.includes('barbie') || txt.includes('j5')) return '👸';
+        if (txt.includes('pista') || txt.includes('tren') || txt.includes('vía') || txt.includes('j6')) return '🛤️';
+        if (txt.includes('pelota') || txt.includes('balon') || txt.includes('futbol')) return '⚽';
+        if (txt.includes('dino') || txt.includes('dinosaurio')) return '🦖';
+        if (txt.includes('robot')) return '🤖';
+        if (txt.includes('bici') || txt.includes('bicicleta')) return '🚲';
+        return '🎁';
+    }
 
     static renderizarCatalogoDestacado() {
         const contenedor = document.getElementById('catalogo-destacado');
         if (!contenedor) return;
 
+        const input = document.getElementById('input-buscar-index');
+        const stockSel = document.getElementById('select-filtro-stock');
+
+        const normalizarTexto = (str) => (str || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+        const term = normalizarTexto(input?.value || '');
+        const filtroStock = stockSel?.value || 'todos';
+
         const repoJuguetes = new LocalStorageRepository('juguetes');
-        const juguetes = repoJuguetes.todos();
+        let juguetes = repoJuguetes.todos();
+
+        if (term) {
+            juguetes = juguetes.filter(j => {
+                const nombreNorm = normalizarTexto(j.nombre);
+                const codigoNorm = normalizarTexto(j.codigo);
+                const precioNorm = normalizarTexto(j.precio);
+
+                return nombreNorm.includes(term) || codigoNorm.includes(term) || precioNorm.includes(term);
+            });
+        }
+
+        if (filtroStock === 'disponible') {
+            juguetes = juguetes.filter(j => j.stock !== undefined ? Number(j.stock) > 0 : true);
+        } else if (filtroStock === 'agotado') {
+            juguetes = juguetes.filter(j => j.stock !== undefined ? Number(j.stock) <= 0 : false);
+        }
 
         if (juguetes.length === 0) {
-            contenedor.innerHTML = '<div class="carousel-item active"><p class="text-white text-center py-4">No hay juguetes disponibles por el momento.</p></div>';
+            contenedor.innerHTML = `
+                <div class="carousel-item active">
+                    <p class="text-white text-center py-4 fs-5 mb-0">No se encontraron juguetes coincidentes.</p>
+                </div>`;
             return;
         }
 
-        const iconos = ['🧸', '🏎️', '🧩', '🧱', '👸', '🛤️']; 
         const gruposJuguetes = [];
         for (let i = 0; i < juguetes.length; i += 3) {
             gruposJuguetes.push(juguetes.slice(i, i + 3));
@@ -49,26 +99,21 @@ export class App {
 
         contenedor.innerHTML = gruposJuguetes.map((grupo, indexGrupo) => {
             const claseActive = indexGrupo === 0 ? 'active' : '';
-            
-            const tarjetasHtml = grupo.map((juguete) => {
-                const indiceReal = juguetes.findIndex(j => j.codigo === juguete.codigo);
-                const icono = iconos[indiceReal % iconos.length];
 
-                return `
-                    <div class="col-md-4">
-                        <div class="card shadow border-0 rounded-4 p-4 bg-white bg-opacity-95 h-100 border-top border-warning border-4 text-center d-flex flex-column">
-                            <div class="display-4 mb-2">${icono}</div>
-                            <span class="badge bg-primary align-self-center mb-2 font-monospace">Código: ${juguete.codigo}</span>
-                            <h3 class="h5 fw-bold text-dark">${juguete.nombre}</h3>
-                            <p class="text-success fw-bold fs-4 mb-1">$${juguete.precio}</p>
-                            <p class="text-secondary small mb-3">Stock disponible: <strong>${juguete.stock}</strong> u.</p>
-                            <a href="./views/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm">
-                                <i class="bi bi-cart-plus me-1"></i> Comprar / Vender
-                            </a>
-                        </div>
+            const tarjetasHtml = grupo.map((juguete) => `
+                <div class="col-md-4">
+                    <div class="card shadow border-0 rounded-4 p-4 bg-white bg-opacity-95 h-100 border-top border-warning border-4 text-center d-flex flex-column">
+                        <div class="display-4 mb-2">${App.obtenerIcono(juguete)}</div>
+                        <span class="badge bg-primary align-self-center mb-2 font-monospace">Código: ${juguete.codigo}</span>
+                        <h3 class="h5 fw-bold text-dark">${juguete.nombre}</h3>
+                        <p class="text-success fw-bold fs-4 mb-1">$${juguete.precio}</p>
+                        <p class="text-secondary small mb-3">Stock disponible: <strong>${juguete.stock !== undefined ? juguete.stock : '1+'}</strong> u.</p>
+                        <a href="./views/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm">
+                            <i class="bi bi-cart-plus me-1"></i> Comprar / Vender
+                        </a>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `).join('');
 
             return `
                 <div class="carousel-item ${claseActive}">
