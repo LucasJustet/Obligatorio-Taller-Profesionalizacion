@@ -7,12 +7,8 @@
     <meta name="description" content="Consulta las estadísticas de rendimiento, ingresos totales, vendedor estrella y juguetes más vendidos en Juguetería El Osito.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://tusitio.com/vistas/estadisticas.html">
-
-    <!-- Preconexión a CDNs para máximo rendimiento -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-
-    <!-- Open Graph / Meta Social -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Estadísticas - Juguetería El Osito">
     <meta property="og:description" content="Consulta el rendimiento, top vendedor y métricas clave en Juguetería El Osito.">
@@ -65,11 +61,26 @@
         .stat-value {
             min-height: 2.2rem;
         }
+
+        .text-muted {
+            color: #4a4a4a !important;
+        }
+        .text-white-custom {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .badge.bg-warning-subtle { color: #5f4300 !important; background-color: #fff3cd !important; }
+        .badge.bg-danger-subtle { color: #842029 !important; background-color: #f8d7da !important; }
+        .badge.bg-primary-subtle { color: #052c65 !important; background-color: #cfe2ff !important; }
+        .badge.bg-success-subtle { color: #0f5132 !important; background-color: #d1e7dd !important; }
+        .badge.bg-info-subtle { color: #055160 !important; background-color: #cff4fc !important; }
+        .badge.bg-secondary-subtle { color: #212529 !important; background-color: #e2e3e5 !important; }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 </head>
 <body class="text-dark d-flex flex-column">
+    <a href="#contenido-principal" class="visually-hidden-focusable p-3 bg-warning text-dark fw-bold position-absolute top-0 start-0 m-2 rounded shadow z-3">Ir al contenido principal</a>
 
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm m-0" aria-label="Navegación principal">
@@ -83,10 +94,10 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                     <ul class="navbar-nav gap-1 text-end text-lg-start">
-                        <li class="nav-item"><a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="../index.html"><i class="bi bi-house-door me-1" aria-hidden="true"></i> Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./juguetes.html"><i class="bi bi-controller me-1" aria-hidden="true"></i> Juguetes</a></li>
-                        <li class="nav-item"><a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./vendedores.html"><i class="bi bi-people me-1" aria-hidden="true"></i> Vendedores</a></li>
-                        <li class="nav-item"><a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./ventas.html"><i class="bi bi-cart-check me-1" aria-hidden="true"></i> Ventas</a></li>
+                        <li class="nav-item"><a class="nav-link text-white-custom px-3 py-2 fw-semibold" href="../index.html"><i class="bi bi-house-door me-1" aria-hidden="true"></i> Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link text-white-custom px-3 py-2 fw-semibold" href="./juguetes.html"><i class="bi bi-controller me-1" aria-hidden="true"></i> Juguetes</a></li>
+                        <li class="nav-item"><a class="nav-link text-white-custom px-3 py-2 fw-semibold" href="./vendedores.html"><i class="bi bi-people me-1" aria-hidden="true"></i> Vendedores</a></li>
+                        <li class="nav-item"><a class="nav-link text-white-custom px-3 py-2 fw-semibold" href="./ventas.html"><i class="bi bi-cart-check me-1" aria-hidden="true"></i> Ventas</a></li>
                         <li class="nav-item"><a class="nav-link active bg-primary text-white rounded px-3 py-2 fw-semibold" href="./estadisticas.html" aria-current="page"><i class="bi bi-bar-chart-fill me-1" aria-hidden="true"></i> Estadísticas</a></li>
                     </ul>
                 </div>
@@ -98,21 +109,18 @@
         <section aria-labelledby="titulo-panel">
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
                 <div>
-                    <h1 id="titulo-panel" class="h3 fw-bold text-white mb-1">Panel de Rendimiento y Estadísticas</h1>
-                    <p class="text-white-50 fs-6 mb-0">Récords de ventas, vendedor estrella e indicadores del negocio.</p>
+                    <h1 id="titulo-panel" class="h3 fw-bold text-white mb-1">Panel De Estadísticas</h1>
+                    <p class="text-white-custom fs-6 mb-0">Récords de ventas, vendedor estrella e indicadores del sistema de negocio.</p>
                 </div>
-                <button id="btn-actualizar-stats" class="btn btn-light fw-bold shadow-sm d-inline-flex align-items-center gap-2 align-self-start align-self-sm-auto" aria-label="Actualizar datos del panel">
-                    <i class="bi bi-arrow-clockwise fs-5" aria-hidden="true"></i>
-                    <span>Actualizar Datos</span>
-                </button>
             </div>
-            <h2 class="h6 fw-bold text-white text-uppercase tracking-wider mb-3"><i class="bi bi-trophy-fill text-warning me-2"></i>Destacados del Negocio</h2>
+            
+            <h2 class="h6 fw-bold text-white text-uppercase tracking-wider mb-3"><i class="bi bi-trophy-fill text-warning me-2" aria-hidden="true"></i>Destacados del Negocio</h2>
             <div class="row g-4 mb-4">
                 <div class="col-12 col-md-6 col-lg-4">
                     <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-warning border-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Vendedor Estrella 👑</h3>
-                            <span class="badge bg-warning-subtle text-warning-emphasis p-2 rounded-circle" aria-hidden="true">
+                            <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Vendedor Estrella</h3>
+                            <span class="badge bg-warning-subtle p-2 rounded-circle" aria-hidden="true">
                                 <i class="bi bi-award-fill fs-5"></i>
                             </span>
                         </div>
@@ -123,8 +131,8 @@
                 <div class="col-12 col-md-6 col-lg-4">
                     <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-danger border-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Juguete Más Vendido 🔥</h3>
-                            <span class="badge bg-danger-subtle text-danger p-2 rounded-circle" aria-hidden="true">
+                            <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Juguete Más Vendido</h3>
+                            <span class="badge bg-danger-subtle p-2 rounded-circle" aria-hidden="true">
                                 <i class="bi bi-fire fs-5"></i>
                             </span>
                         </div>
@@ -133,28 +141,27 @@
                     </article>
                 </div>
                 <div class="col-12 col-md-12 col-lg-4">
-                    <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-purple border-4 h-100">
+                    <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-primary border-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Ticket Promedio 💳</h3>
-                            <span class="badge bg-primary-subtle text-primary p-2 rounded-circle" aria-hidden="true">
+                            <h3 class="h6 text-uppercase fw-bold text-muted mb-0"> Promedio por Venta</h3>
+                            <span class="badge bg-primary-subtle p-2 rounded-circle" aria-hidden="true">
                                 <i class="bi bi-calculator-fill fs-5"></i>
                             </span>
                         </div>
                         <p class="display-6 fw-bold text-primary mb-1 stat-value" id="stat-ticket-promedio" aria-live="polite">$0.00</p>
-                        <small class="text-muted">Monto promedio por transacción</small>
                     </article>
                 </div>
             </div>
-            <h2 class="h6 fw-bold text-white text-uppercase tracking-wider mb-3"><i class="bi bi-pie-chart-fill text-info me-2"></i>Totales de Inventario y Ventas</h2>
+
+            <h2 class="h6 fw-bold text-white text-uppercase tracking-wider mb-3"><i class="bi bi-pie-chart-fill text-info me-2" aria-hidden="true"></i>Totales de Inventario y Ventas</h2>
             <div class="row g-4" id="contenedor-stats">
                 <div class="col-12 col-md-6 col-lg-4">
                     <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-success border-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Ingresos Totales</h3>
-                            <span class="badge bg-success-subtle text-success p-2 rounded-circle" aria-hidden="true"><i class="bi bi-currency-dollar fs-5"></i></span>
+                            <span class="badge bg-success-subtle p-2 rounded-circle" aria-hidden="true"><i class="bi bi-currency-dollar fs-5"></i></span>
                         </div>
                         <p class="display-6 fw-bold text-success mb-1 stat-value" id="stat-ingresos" aria-live="polite">$0.00</p>
-                        <small class="text-muted"><i class="bi bi-graph-up-arrow text-success me-1"></i>Monto bruto recaudado</small>
                     </article>
                 </div>
 
@@ -162,10 +169,9 @@
                     <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-primary border-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Ventas Realizadas</h3>
-                            <span class="badge bg-primary-subtle text-primary p-2 rounded-circle" aria-hidden="true"><i class="bi bi-bag-check-fill fs-5"></i></span>
+                            <span class="badge bg-primary-subtle p-2 rounded-circle" aria-hidden="true"><i class="bi bi-bag-check-fill fs-5"></i></span>
                         </div>
                         <p class="display-6 fw-bold text-primary mb-1 stat-value" id="stat-ventas" aria-live="polite">0</p>
-                        <small class="text-muted"><i class="bi bi-receipt me-1"></i>Total transacciones</small>
                     </article>
                 </div>
 
@@ -173,10 +179,9 @@
                     <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-warning border-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Stock Total</h3>
-                            <span class="badge bg-warning-subtle text-warning-emphasis p-2 rounded-circle" aria-hidden="true"><i class="bi bi-boxes fs-5"></i></span>
+                            <span class="badge bg-warning-subtle p-2 rounded-circle" aria-hidden="true"><i class="bi bi-boxes fs-5"></i></span>
                         </div>
                         <p class="display-6 fw-bold text-warning-emphasis mb-1 stat-value" id="stat-stock" aria-live="polite">0</p>
-                        <small class="text-muted"><i class="bi bi-box-seam me-1"></i>Unidades en almacén</small>
                     </article>
                 </div>
 
@@ -184,10 +189,9 @@
                     <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-info border-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Tipos de Juguetes</h3>
-                            <span class="badge bg-info-subtle text-info p-2 rounded-circle" aria-hidden="true"><i class="bi bi-puzzle-fill fs-5"></i></span>
+                            <span class="badge bg-info-subtle p-2 rounded-circle" aria-hidden="true"><i class="bi bi-puzzle-fill fs-5"></i></span>
                         </div>
                         <p class="display-6 fw-bold text-info mb-1 stat-value" id="stat-juguetes" aria-live="polite">0</p>
-                        <small class="text-muted"><i class="bi bi-tags me-1"></i>Variedad de catálogo</small>
                     </article>
                 </div>
 
@@ -195,10 +199,9 @@
                     <article class="card stat-card shadow border-0 rounded-4 p-4 bg-white border-top border-secondary border-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h3 class="h6 text-uppercase fw-bold text-muted mb-0">Vendedores Activos</h3>
-                            <span class="badge bg-secondary-subtle text-secondary p-2 rounded-circle" aria-hidden="true"><i class="bi bi-person-badge-fill fs-5"></i></span>
+                            <span class="badge bg-secondary-subtle p-2 rounded-circle" aria-hidden="true"><i class="bi bi-person-badge-fill fs-5"></i></span>
                         </div>
                         <p class="display-6 fw-bold text-secondary mb-1 stat-value" id="stat-vendedores" aria-live="polite">0</p>
-                        <small class="text-muted"><i class="bi bi-people me-1"></i>Equipo registrado</small>
                     </article>
                 </div>
             </div>

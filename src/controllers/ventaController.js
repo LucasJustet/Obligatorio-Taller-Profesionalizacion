@@ -11,13 +11,11 @@ export class VentaController {
     }
 
     init() {
+       
         document.getElementById('btn-agregar')?.addEventListener('click', () => this.agregar());
         document.getElementById('btn-modificar')?.addEventListener('click', () => this.modificar());
         document.getElementById('btn-eliminar')?.addEventListener('click', () => this.eliminar());
         document.getElementById('btn-limpiar')?.addEventListener('click', () => this.inicializarFormulario());
-        document.getElementById('lista-ventas')?.addEventListener('change', () => this.seleccionar());
-        
-        // --- VALIDACIÓN EN TIEMPO REAL ---
         document.getElementById('fecha')?.addEventListener('change', () => this.validarFecha());
         document.getElementById('vendedor')?.addEventListener('change', () => this.validarVendedor());
         document.getElementById('juguete')?.addEventListener('change', () => {
@@ -28,7 +26,6 @@ export class VentaController {
             this.validarCantidad();
             this.calcularTotal();
         });
-
         document.getElementById('buscador-ventas')?.addEventListener('input', (e) => this.filtrarLista(e.target.value));
         this.cargarSelects();
         this.inicializarFormulario();
@@ -36,9 +33,9 @@ export class VentaController {
     }
 
     generarSiguienteCodigo() {
-        const ventas = this.ventaRepo.todos();
-        if (!ventas || ventas.length === 0) return "1";
-        const numeros = ventas.map(v => parseInt(v.codigo, 10)).filter(n => !isNaN(n));
+        const ventas = this.ventaRepo.todos() || [];
+        if (ventas.length === 0) return "1";
+        const numeros = ventas.map(v => parseInt(v.codigo ?? v.id, 10)).filter(n => !isNaN(n));
         const maxNumero = numeros.length > 0 ? Math.max(...numeros) : 0;
         return String(maxNumero + 1);
     }
@@ -47,17 +44,22 @@ export class VentaController {
         const selectVendedor = document.getElementById('vendedor');
         const selectJuguete = document.getElementById('juguete');
 
+        const vendedores = this.vendedorRepo.todos() || [];
+        const juguetes = this.jugueteRepo.todos() || [];
+
         if (selectVendedor) {
             selectVendedor.innerHTML = '<option value="" selected disabled>Seleccione un vendedor...</option>';
-            this.vendedorRepo.todos().forEach(v => {
-                selectVendedor.add(new Option(`${v.nombre} (Cédula: ${v.cedula})`, v.codigo));
+            vendedores.forEach(v => {
+                const idVendedor = String(v.codigo ?? v.id);
+                selectVendedor.add(new Option(`${v.nombre} (Cédula: ${v.cedula || 'N/A'})`, idVendedor));
             });
         }
 
         if (selectJuguete) {
             selectJuguete.innerHTML = '<option value="" selected disabled>Seleccione un juguete...</option>';
-            this.jugueteRepo.todos().forEach(j => {
-                selectJuguete.add(new Option(`${j.nombre} - $${j.precio} (Stock: ${j.stock})`, j.codigo));
+            juguetes.forEach(j => {
+                const idJuguete = String(j.codigo ?? j.id);
+                selectJuguete.add(new Option(`${j.nombre} - $${j.precio} (Stock: ${j.stock})`, idJuguete));
             });
         }
     }
@@ -72,9 +74,11 @@ export class VentaController {
             return;
         }
 
-        const juguete = this.jugueteRepo.todos().find(j => j.codigo === jugueteCodigo);
+        const juguetes = this.jugueteRepo.todos() || [];
+        const juguete = juguetes.find(j => String(j.codigo ?? j.id) === String(jugueteCodigo));
+        
         if (juguete && txtTotal) {
-            const total = juguete.precio * cantidad;
+            const total = Number(juguete.precio) * cantidad;
             txtTotal.value = total.toFixed(2);
         }
     }
@@ -86,7 +90,7 @@ export class VentaController {
         const selectJuguete = document.getElementById('juguete');
         const txtCantidad = document.getElementById('cantidad');
         const txtTotal = document.getElementById('total');
-        const form = document.getElementById('form-venta') || document.querySelector('form');
+        const form = document.getElementById('form-venta');
 
         if (form) UIService.limpiarErrores(form);
 
@@ -98,40 +102,39 @@ export class VentaController {
         if (txtTotal) txtTotal.value = '0.00';
 
         this.calcularTotal();
-        this.listar(); // Recarga la lista completa por si había filtro activo
+        this.listar();
     }
 
     validarFecha() {
         const txtFecha = document.getElementById('fecha');
-        if (!txtFecha?.value) {
+        if (!txtFecha?.value?.trim()) {
             UIService.marcarInvalido(txtFecha, '❌ Seleccione una fecha válida.');
             return false;
-        } else {
-            UIService.marcarValido(txtFecha, '✅ Fecha correcta.');
-            return true;
         }
+        UIService.marcarValido(txtFecha, '✅ Fecha correcta.');
+        return true;
     }
 
     validarVendedor() {
         const selectVendedor = document.getElementById('vendedor');
-        if (!selectVendedor?.value) {
+        const val = selectVendedor?.value?.trim();
+        if (!val) {
             UIService.marcarInvalido(selectVendedor, '❌ Debe seleccionar un vendedor.');
             return false;
-        } else {
-            UIService.marcarValido(selectVendedor, '✅ Vendedor seleccionado.');
-            return true;
         }
+        UIService.marcarValido(selectVendedor, '✅ Vendedor seleccionado.');
+        return true;
     }
 
     validarJuguete() {
         const selectJuguete = document.getElementById('juguete');
-        if (!selectJuguete?.value) {
+        const val = selectJuguete?.value?.trim();
+        if (!val) {
             UIService.marcarInvalido(selectJuguete, '❌ Debe seleccionar un juguete.');
             return false;
-        } else {
-            UIService.marcarValido(selectJuguete, '✅ Juguete seleccionado.');
-            return true;
         }
+        UIService.marcarValido(selectJuguete, '✅ Juguete seleccionado.');
+        return true;
     }
 
     validarCantidad() {
@@ -140,10 +143,9 @@ export class VentaController {
         if (txtCantidad?.value === '' || isNaN(cantidad) || cantidad < 1) {
             UIService.marcarInvalido(txtCantidad, '❌ La cantidad debe ser al menos 1.');
             return false;
-        } else {
-            UIService.marcarValido(txtCantidad, '✅ Cantidad correcta.');
-            return true;
         }
+        UIService.marcarValido(txtCantidad, '✅ Cantidad correcta.');
+        return true;
     }
 
     agregar() {
@@ -153,7 +155,7 @@ export class VentaController {
         const cValida = this.validarCantidad();
 
         if (!fValida || !vValido || !jValido || !cValida) {
-            UIService.mostrarNotificacion('Por favor, corrija los errores en el formulario.', 'danger');
+            UIService.mostrarNotificacion('Por favor, complete todos los campos obligatorios.', 'danger');
             return;
         }
 
@@ -163,10 +165,15 @@ export class VentaController {
         const jugueteCodigo = document.getElementById('juguete').value;
         const cantidad = Number(document.getElementById('cantidad').value);
 
-        const vendedor = this.vendedorRepo.todos().find(v => v.codigo === vendedorCodigo);
-        const juguete = this.jugueteRepo.todos().find(j => j.codigo === jugueteCodigo);
+        const vendedor = (this.vendedorRepo.todos() || []).find(v => String(v.codigo ?? v.id) === String(vendedorCodigo));
+        const juguete = (this.jugueteRepo.todos() || []).find(j => String(j.codigo ?? j.id) === String(jugueteCodigo));
 
-        if (juguete.stock < cantidad) {
+        if (!vendedor || !juguete) {
+            UIService.mostrarNotificacion('El vendedor o el juguete seleccionado no existen.', 'danger');
+            return;
+        }
+
+        if (Number(juguete.stock) < cantidad) {
             UIService.mostrarNotificacion(`Stock insuficiente. Disponible: ${juguete.stock}`, 'danger');
             UIService.marcarInvalido(document.getElementById('cantidad'), '❌ Stock insuficiente');
             return;
@@ -174,7 +181,7 @@ export class VentaController {
 
         const venta = new Venta(codigoVenta, fecha, vendedor, juguete, cantidad);
         
-        juguete.stock -= cantidad;
+        juguete.stock = Number(juguete.stock) - cantidad;
         this.jugueteRepo.guardar(juguete);
         this.ventaRepo.guardar(venta);
         
@@ -183,36 +190,37 @@ export class VentaController {
         this.inicializarFormulario();
     }
 
-    seleccionar() {
-        const codigo = document.getElementById('lista-ventas')?.value;
-        const venta = this.ventaRepo.todos().find(v => String(v.codigo) === String(codigo));
+    cargarParaEditar(codigo) {
+        const venta = (this.ventaRepo.todos() || []).find(v => String(v.codigo ?? v.id) === String(codigo));
 
         if (venta) {
-            document.getElementById('codigoVenta').value = venta.codigo;
+            document.getElementById('codigoVenta').value = venta.codigo ?? venta.id;
             document.getElementById('fecha').value = venta.fecha;
-            document.getElementById('vendedor').value = venta.vendedor?.codigo || '';
-            document.getElementById('juguete').value = venta.juguete?.codigo || '';
+            document.getElementById('vendedor').value = venta.vendedor?.codigo ?? venta.vendedor?.id ?? '';
+            document.getElementById('juguete').value = venta.juguete?.codigo ?? venta.juguete?.id ?? '';
             document.getElementById('cantidad').value = venta.cantidad;
             
             this.calcularTotal();
-            const form = document.querySelector('form');
+            const form = document.getElementById('form-venta');
             if (form) UIService.limpiarErrores(form);
 
             this.validarFecha();
             this.validarVendedor();
             this.validarJuguete();
             this.validarCantidad();
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
-    modificar() {
+  modificar() {
         const fValida = this.validarFecha();
         const vValido = this.validarVendedor();
         const jValido = this.validarJuguete();
         const cValida = this.validarCantidad();
 
         if (!fValida || !vValido || !jValido || !cValida) {
-            UIService.mostrarNotificacion('Por favor, corrija los errores antes de modificar.', 'danger');
+            UIService.mostrarNotificacion('Por favor, corrija los errores antes de guardar.', 'danger');
             return;
         }
 
@@ -220,54 +228,68 @@ export class VentaController {
         const fecha = document.getElementById('fecha').value;
         const vendedorCodigo = document.getElementById('vendedor').value;
         const jugueteCodigo = document.getElementById('juguete').value;
-        const cantidad = Number(document.getElementById('cantidad').value);
-
-        const ventaExistente = this.ventaRepo.todos().find(v => String(v.codigo) === String(codigoVenta));
+        const nuevaCantidad = Number(document.getElementById('cantidad').value);
+        const ventaExistente = (this.ventaRepo.todos() || []).find(v => String(v.codigo ?? v.id) === String(codigoVenta));
         if (!ventaExistente) {
-            UIService.mostrarNotificacion('Debe seleccionar una venta de la lista para modificar.', 'warning');
+            UIService.mostrarNotificacion('No se encontró la venta a modificar.', 'danger');
             return;
         }
 
-        const vendedor = this.vendedorRepo.todos().find(v => v.codigo === vendedorCodigo);
-        const jugueteNuevo = this.jugueteRepo.todos().find(j => j.codigo === jugueteCodigo);
-        const jugueteAntiguo = this.jugueteRepo.todos().find(j => j.codigo === ventaExistente.juguete?.codigo);
+        const vendedor = (this.vendedorRepo.todos() || []).find(v => String(v.codigo ?? v.id) === String(vendedorCodigo));
+        const jugueteAntiguoId = String(ventaExistente.juguete?.codigo ?? ventaExistente.juguete?.id);
+        const cantidadAntigua = Number(ventaExistente.cantidad);
+        let juguetes = this.jugueteRepo.todos() || [];
+        const jugueteAntiguo = juguetes.find(j => String(j.codigo ?? j.id) === jugueteAntiguoId);
+        const jugueteNuevo = juguetes.find(j => String(j.codigo ?? j.id) === String(jugueteCodigo));
 
+        if (!vendedor || !jugueteNuevo) {
+            UIService.mostrarNotificacion('El vendedor o el juguete seleccionado no existen.', 'danger');
+            return;
+        }
+
+      
         if (jugueteAntiguo) {
-            jugueteAntiguo.stock += Number(ventaExistente.cantidad);
-            if (jugueteAntiguo.codigo !== jugueteNuevo.codigo) {
+            jugueteAntiguo.stock = Number(jugueteAntiguo.stock) + cantidadAntigua;
+        }
+
+        if (Number(jugueteNuevo.stock) < nuevaCantidad) {
+            UIService.mostrarNotificacion(`Stock insuficiente. Disponible: ${jugueteNuevo.stock}`, 'danger');
+          
+            if (jugueteAntiguo) {
+                jugueteAntiguo.stock = Number(jugueteAntiguo.stock) - cantidadAntigua;
                 this.jugueteRepo.guardar(jugueteAntiguo);
             }
-        }
-
-        if (jugueteNuevo.stock < cantidad) {
-            UIService.mostrarNotificacion(`Stock insuficiente. Disponible: ${jugueteNuevo.stock}`, 'danger');
-            UIService.marcarInvalido(document.getElementById('cantidad'), '❌ Stock insuficiente');
             return;
         }
 
-        jugueteNuevo.stock -= cantidad;
-        this.jugueteRepo.guardar(jugueteNuevo);
-
-        const ventaActualizada = new Venta(codigoVenta, fecha, vendedor, jugueteNuevo, cantidad);
+        if (jugueteAntiguo && jugueteAntiguoId === String(jugueteNuevo.codigo ?? jugueteNuevo.id)) {
+          
+            jugueteAntiguo.stock = Number(jugueteAntiguo.stock) - nuevaCantidad;
+            this.jugueteRepo.guardar(jugueteAntiguo);
+        } else {
+        
+            if (jugueteAntiguo) this.jugueteRepo.guardar(jugueteAntiguo);
+            jugueteNuevo.stock = Number(jugueteNuevo.stock) - nuevaCantidad;
+            this.jugueteRepo.guardar(jugueteNuevo);
+        }
+        const ventaActualizada = new Venta(codigoVenta, fecha, vendedor, jugueteNuevo, nuevaCantidad);
         this.ventaRepo.guardar(ventaActualizada);
 
-        UIService.mostrarNotificacion('¡Venta modificada con éxito!', 'success');
+        UIService.mostrarNotificacion('¡Cambios guardados con éxito!', 'success');
         this.cargarSelects();
         this.inicializarFormulario();
     }
 
-    eliminar() {
-        const codigo = document.getElementById('lista-ventas')?.value;
-        if (!codigo) {
-            UIService.mostrarNotificacion('Debe seleccionar una venta para eliminar.', 'warning');
-            return;
-        }
+    eliminar(codigo) {
+        if (!codigo) return;
+        
+        if (!confirm('¿Está seguro de que desea eliminar esta venta?')) return;
 
-        const venta = this.ventaRepo.todos().find(v => String(v.codigo) === String(codigo));
+        const venta = (this.ventaRepo.todos() || []).find(v => String(v.codigo ?? v.id) === String(codigo));
         if (venta && venta.juguete) {
-            const juguete = this.jugueteRepo.todos().find(j => j.codigo === venta.juguete.codigo);
+            const juguete = (this.jugueteRepo.todos() || []).find(j => String(j.codigo ?? j.id) === String(venta.juguete.codigo ?? venta.juguete.id));
             if (juguete) {
-                juguete.stock += Number(venta.cantidad);
+                juguete.stock = Number(juguete.stock) + Number(venta.cantidad);
                 this.jugueteRepo.guardar(juguete);
             }
         }
@@ -279,31 +301,72 @@ export class VentaController {
     }
 
     listar(ventasFiltradas = null) {
-        const lista = document.getElementById('lista-ventas');
-        if (!lista) return;
-        lista.innerHTML = '';
+        const tbody = document.getElementById('tabla-ventas-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
         
-        const datos = ventasFiltradas || this.ventaRepo.todos();
-        for (let venta of datos) {
+        const datos = ventasFiltradas || this.ventaRepo.todos() || [];
+        
+        if (datos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No hay ventas registradas.</td></tr>`;
+            return;
+        }
+
+        datos.forEach(venta => {
             let vendedorNombre = venta.vendedor?.nombre || 'Desconocido';
             let jugueteNombre = venta.juguete?.nombre || 'Desconocido';
             let total = venta.total || (venta.juguete?.precio * venta.cantidad) || 0;
-            let texto = `Venta #${venta.codigo} | ${venta.fecha} - ${vendedorNombre} - ${jugueteNombre} (Cant: ${venta.cantidad}) - Total: $${total}`;
-            lista.add(new Option(texto, venta.codigo));
-        }
+            let cod = String(venta.codigo ?? venta.id);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="fw-bold ps-3">${cod}</td>
+                <td>${venta.fecha}</td>
+                <td>${vendedorNombre}</td>
+                <td>${jugueteNombre}</td>
+                <td>${venta.cantidad}</td>
+                <td class="fw-bold text-success">$${Number(total).toFixed(2)}</td>
+                <td class="text-center pe-3">
+                   <button type="button" class="btn btn-sm btn-outline-primary me-1 btn-editar" title="Editar venta" data-codigo="${cod}" aria-label="Editar venta ${cod}">
+                   <i class="bi bi-pencil-fill" aria-hidden="true"></i>
+                   </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-borrar" title="Eliminar venta" data-codigo="${cod}">
+                        <i class="bi bi-trash" aria-hidden="true"></i>
+                    </button>
+                </td>
+            `;
+            
+            tbody.appendChild(tr);
+        });
+
+      
+        tbody.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const codigo = e.currentTarget.getAttribute('data-codigo');
+                this.cargarParaEditar(codigo);
+            });
+        });
+
+        tbody.querySelectorAll('.btn-borrar').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const codigo = e.currentTarget.getAttribute('data-codigo');
+                this.eliminar(codigo);
+            });
+        });
     }
 
     filtrarLista(filtro) {
         const texto = filtro.toLowerCase().trim();
-        const todos = this.ventaRepo.todos();
+        const todos = this.ventaRepo.todos() || [];
         
         const filtrados = todos.filter(venta => {
             let vendedorNombre = venta.vendedor?.nombre || '';
             let jugueteNombre = venta.juguete?.nombre || '';
             let total = String(venta.total || (venta.juguete?.precio * venta.cantidad) || 0);
+            let cod = String(venta.codigo ?? venta.id);
 
             return (
-                String(venta.codigo).toLowerCase().includes(texto) ||
+                cod.toLowerCase().includes(texto) ||
                 String(venta.fecha).toLowerCase().includes(texto) ||
                 vendedorNombre.toLowerCase().includes(texto) ||
                 jugueteNombre.toLowerCase().includes(texto) ||
