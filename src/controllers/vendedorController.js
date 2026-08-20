@@ -5,21 +5,38 @@ import { UIService } from '../services/ui.js';
 export class VendedorController {
     constructor() {
         this.repo = new LocalStorageRepository('vendedores');
+        this.guardando = false; 
         this.init();
     }
 
     init() {
-        document.getElementById('btn-agregar')?.addEventListener('click', () => this.agregar());
-        document.getElementById('btn-modificar')?.addEventListener('click', () => this.modificar());
-        document.getElementById('btn-eliminar')?.addEventListener('click', () => this.eliminar());
-        document.getElementById('btn-limpiar')?.addEventListener('click', () => this.inicializarFormulario());
+        const form = document.getElementById('form-vendedor');
+        if (form) {
+            form.addEventListener('submit', (e) => e.preventDefault());
+        }
+
+        document.getElementById('btn-agregar')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.agregar();
+        });
+        document.getElementById('btn-modificar')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.modificar();
+        });
+        document.getElementById('btn-eliminar')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.eliminar();
+        });
+        document.getElementById('btn-limpiar')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.inicializarFormulario();
+        });
+
         document.getElementById('lista-vendedores')?.addEventListener('change', () => this.seleccionar());
 
-        // --- VALIDACIÓN EN TIEMPO REAL ---
         document.getElementById('codigo')?.addEventListener('input', () => this.validarCodigo());
         document.getElementById('nombre')?.addEventListener('input', () => this.validarNombre());
-        
-     
+
         const inputCedula = document.getElementById('cedula');
         if (inputCedula) {
             inputCedula.addEventListener('input', (e) => {
@@ -27,10 +44,10 @@ export class VendedorController {
                 this.validarCedula();
             });
         }
+
         document.getElementById('buscador-vendedores')?.addEventListener('input', (e) => this.filtrarLista(e.target.value));
 
         this.inicializarFormulario();
-        this.listar();
     }
 
     inicializarFormulario() {
@@ -39,12 +56,18 @@ export class VendedorController {
         const txtCedula = document.getElementById('cedula');
         const form = document.getElementById('form-vendedor') || document.querySelector('form');
 
-        if (form) UIService.limpiarErrores(form);
-
-        if (txtCodigo) { txtCodigo.value = ''; txtCodigo.disabled = false; txtCodigo.focus(); }
+        if (txtCodigo) { txtCodigo.value = ''; txtCodigo.disabled = false; }
         if (txtNombre) txtNombre.value = '';
         if (txtCedula) txtCedula.value = '';
-        
+
+        if (form && typeof UIService.limpiarErrores === 'function') {
+            UIService.limpiarErrores(form);
+        } else {
+            [txtCodigo, txtNombre, txtCedula].forEach(input => {
+                if (input) input.classList.remove('is-invalid', 'is-valid');
+            });
+        }
+
         this.listar(); 
     }
 
@@ -108,30 +131,38 @@ export class VendedorController {
     }
 
     agregar() {
+        if (this.guardando) return;
+        this.guardando = true;
+
         const cValido = this.validarCodigo();
         const nValido = this.validarNombre();
         const ceValido = this.validarCedula();
 
         if (!cValido || !nValido || !ceValido) {
             UIService.mostrarNotificacion('Por favor, corrija los errores en el formulario.', 'danger');
+            this.guardando = false;
             return;
         }
 
-        const codigo = document.getElementById('codigo').value;
-        const nombre = document.getElementById('nombre').value;
-        const cedula = document.getElementById('cedula').value;
+        const codigo = document.getElementById('codigo').value.trim();
+        const nombre = document.getElementById('nombre').value.trim();
+        const cedula = document.getElementById('cedula').value.trim();
 
-        const vendedor = new Vendedor(codigo, nombre, cedula);
-        const existente = this.repo.todos().find(v => v.codigo === vendedor.codigo);
+        const existente = this.repo.todos().find(v => v.codigo === codigo);
         if (existente) {
             UIService.mostrarNotificacion('Ya existe un vendedor con ese código.', 'warning');
             UIService.marcarInvalido(document.getElementById('codigo'), '❌ Código duplicado');
+            this.guardando = false;
             return;
         }
 
+        const vendedor = new Vendedor(codigo, nombre, cedula);
         this.repo.guardar(vendedor);
+
         UIService.mostrarNotificacion('¡Vendedor agregado con éxito!', 'success');
         this.inicializarFormulario();
+
+        setTimeout(() => { this.guardando = false; }, 100);
     }
 
     seleccionar() {
@@ -147,8 +178,10 @@ export class VendedorController {
             if (txtNombre) txtNombre.value = vendedor.nombre;
             if (txtCedula) txtCedula.value = vendedor.cedula;
 
-            const form = document.querySelector('form');
-            if (form) UIService.limpiarErrores(form);
+            const form = document.getElementById('form-vendedor') || document.querySelector('form');
+            if (form && typeof UIService.limpiarErrores === 'function') {
+                UIService.limpiarErrores(form);
+            }
 
             this.validarCodigo();
             this.validarNombre();
@@ -166,13 +199,13 @@ export class VendedorController {
             return;
         }
 
-        const codigo = document.getElementById('codigo').value;
-        const nombre = document.getElementById('nombre').value;
-        const cedula = document.getElementById('cedula').value;
+        const codigo = document.getElementById('codigo').value.trim();
+        const nombre = document.getElementById('nombre').value.trim();
+        const cedula = document.getElementById('cedula').value.trim();
 
         const vendedorActualizado = new Vendedor(codigo, nombre, cedula);
         this.repo.guardar(vendedorActualizado);
-        
+
         UIService.mostrarNotificacion('¡Vendedor modificado con éxito!', 'success');
         this.inicializarFormulario();
     }
@@ -192,22 +225,22 @@ export class VendedorController {
         const lista = document.getElementById('lista-vendedores');
         if (!lista) return;
         lista.innerHTML = '';
-        
+
         const datos = vendedoresFiltrados || this.repo.todos();
         for (let vendedor of datos) {
-            let texto = `${vendedor.codigo} - ${vendedor.nombre} - CI: ${vendedor.cedula}`;
+            let texto = `${vendedor.codigo}  -  ${vendedor.nombre}  -  CI: ${vendedor.cedula}`;
             lista.add(new Option(texto, vendedor.codigo));
         }
     }
 
     filtrarLista(filtro) {
-        const texto = filtro.toLowerCase().trim();
+        const texto = (filtro || '').toLowerCase().trim();
         const todos = this.repo.todos();
-        
+
         const filtrados = todos.filter(v => 
-            v.codigo.toLowerCase().includes(texto) || 
-            v.nombre.toLowerCase().includes(texto) || 
-            v.cedula.toLowerCase().includes(texto)
+            (v.codigo && v.codigo.toLowerCase().includes(texto)) || 
+            (v.nombre && v.nombre.toLowerCase().includes(texto)) || 
+            (v.cedula && v.cedula.toLowerCase().includes(texto))
         );
 
         this.listar(filtrados);

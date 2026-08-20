@@ -28,28 +28,17 @@ export class App {
             juguetes.forEach(j => repoJuguetes.guardar(j));
         }
     }
+
     static obtenerIcono(juguete) {
         if (!juguete) return '🎁';
-        if (typeof juguete === 'string') return App.obtenerIconoPorNombre(juguete);
-        if (juguete.icono) return juguete.icono;
-
-        return App.obtenerIconoPorNombre(juguete.nombre || juguete.codigo || '');
-    }
-
-    static obtenerIconoPorNombre(nombre) {
-        const txt = (nombre || '').toLowerCase();
+        const txt = ((juguete.nombre || juguete.codigo || '')).toLowerCase();
 
         if (txt.includes('oso') || txt.includes('peluche') || txt.includes('j1')) return '🧸';
         if (txt.includes('auto') || txt.includes('carro') || txt.includes('remoto') || txt.includes('j2')) return '🏎️';
         if (txt.includes('rompecabezas') || txt.includes('juego') || txt.includes('puzzle') || txt.includes('j3')) return '🧩';
-        if (txt.includes('avion') || txt.includes('avión') || txt.includes('vuelo') || txt.includes('helicoptero')) return '✈️';
         if (txt.includes('bloque') || txt.includes('lego') || txt.includes('construccion') || txt.includes('j4')) return '🧱';
-        if (txt.includes('muñeca') || txt.includes('princesa') || txt.includes('barbie') || txt.includes('j5')) return '👸';
-        if (txt.includes('pista') || txt.includes('tren') || txt.includes('vía') || txt.includes('j6')) return '🛤️';
-        if (txt.includes('pelota') || txt.includes('balon') || txt.includes('futbol')) return '⚽';
-        if (txt.includes('dino') || txt.includes('dinosaurio')) return '🦖';
-        if (txt.includes('robot')) return '🤖';
-        if (txt.includes('bici') || txt.includes('bicicleta')) return '🚲';
+        if (txt.includes('muñeca') || txt.includes('princesa') || txt.includes('j5')) return '👸';
+        if (txt.includes('pista') || txt.includes('tren') || txt.includes('j6')) return '🛤️';
         return '🎁';
     }
 
@@ -73,7 +62,6 @@ export class App {
                 const nombreNorm = normalizarTexto(j.nombre);
                 const codigoNorm = normalizarTexto(j.codigo);
                 const precioNorm = normalizarTexto(j.precio);
-
                 return nombreNorm.includes(term) || codigoNorm.includes(term) || precioNorm.includes(term);
             });
         }
@@ -108,7 +96,7 @@ export class App {
                         <h3 class="h5 fw-bold text-dark">${juguete.nombre}</h3>
                         <p class="text-success fw-bold fs-4 mb-1">$${juguete.precio}</p>
                         <p class="text-secondary small mb-3">Stock disponible: <strong>${juguete.stock !== undefined ? juguete.stock : '1+'}</strong> u.</p>
-                        <a href="./views/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm">
+                        <a href="./vistas/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm">
                             <i class="bi bi-cart-plus me-1"></i> Comprar / Vender
                         </a>
                     </div>
@@ -125,10 +113,42 @@ export class App {
         }).join('');
     }
 
-    static init() {
+    static async cargarControladorPagina() {
+        const path = window.location.pathname.toLowerCase();
+
+        try {
+            if (path.includes('estadisticas.html')) {
+                const { EstadisticaController } = await import('./controllers/estadisticaController.js');
+                if (EstadisticaController) new EstadisticaController();
+            } else if (path.includes('ventas.html')) {
+                if (!window.ventaControllerInstanciado) {
+                    const { VentaController } = await import('./controllers/ventaController.js');
+                    if (VentaController) {
+                        new VentaController();
+                        window.ventaControllerInstanciado = true;
+                    }
+                }
+            } else if (path.includes('juguetes.html')) {
+                const { JugueteController } = await import('./controllers/jugueteController.js');
+                if (JugueteController) new JugueteController();
+            } else if (path.includes('vendedores.html')) {
+                const { VendedorController } = await import('./controllers/vendedorController.js');
+                if (VendedorController) new VendedorController();
+            }
+        } catch (error) {
+            console.error('Error al cargar dinámicamente el controlador:', error);
+        }
+    }
+
+    static async init() {
         this.precargarDatosIniciales();
-        UIService.activarNavegacion();
+
+        if (typeof UIService?.activarNavegacion === 'function') {
+            UIService.activarNavegacion();
+        }
+
         this.renderizarCatalogoDestacado();
+        await this.cargarControladorPagina();
     }
 }
 
