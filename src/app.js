@@ -96,7 +96,7 @@ export class App {
                         <h3 class="h5 fw-bold text-dark">${juguete.nombre}</h3>
                         <p class="text-success fw-bold fs-4 mb-1">$${juguete.precio}</p>
                         <p class="text-secondary small mb-3">Stock disponible: <strong>${juguete.stock !== undefined ? juguete.stock : '1+'}</strong> u.</p>
-                        <a href="./vistas/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm">
+                        <a href="./views/ventas.html" class="btn btn-warning text-dark fw-semibold btn-sm mt-auto shadow-sm">
                             <i class="bi bi-cart-plus me-1"></i> Comprar / Vender
                         </a>
                     </div>

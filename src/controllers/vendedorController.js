@@ -6,6 +6,7 @@ export class VendedorController {
     constructor() {
         this.repo = new LocalStorageRepository('vendedores');
         this.guardando = false; 
+        this.codigoEnEdicion = null;
         this.init();
     }
 
@@ -32,8 +33,6 @@ export class VendedorController {
             this.inicializarFormulario();
         });
 
-        document.getElementById('lista-vendedores')?.addEventListener('change', () => this.seleccionar());
-
         document.getElementById('codigo')?.addEventListener('input', () => this.validarCodigo());
         document.getElementById('nombre')?.addEventListener('input', () => this.validarNombre());
 
@@ -54,11 +53,20 @@ export class VendedorController {
         const txtCodigo = document.getElementById('codigo');
         const txtNombre = document.getElementById('nombre');
         const txtCedula = document.getElementById('cedula');
+        const btnAgregar = document.getElementById('btn-agregar');
+        const btnModificar = document.getElementById('btn-modificar');
+        const btnEliminar = document.getElementById('btn-eliminar');
         const form = document.getElementById('form-vendedor') || document.querySelector('form');
 
         if (txtCodigo) { txtCodigo.value = ''; txtCodigo.disabled = false; }
         if (txtNombre) txtNombre.value = '';
         if (txtCedula) txtCedula.value = '';
+
+        this.codigoEnEdicion = null;
+
+        if (btnAgregar) btnAgregar.disabled = false;
+        if (btnModificar) btnModificar.disabled = true;
+        if (btnEliminar) btnEliminar.disabled = true;
 
         if (form && typeof UIService.limpiarErrores === 'function') {
             UIService.limpiarErrores(form);
@@ -165,18 +173,25 @@ export class VendedorController {
         setTimeout(() => { this.guardando = false; }, 100);
     }
 
-    seleccionar() {
-        const codigo = document.getElementById('lista-vendedores')?.value;
+    seleccionar(codigo) {
         const vendedor = this.repo.todos().find(v => v.codigo === codigo);
 
         if (vendedor) {
+            this.codigoEnEdicion = codigo;
             const txtCodigo = document.getElementById('codigo');
             const txtNombre = document.getElementById('nombre');
             const txtCedula = document.getElementById('cedula');
+            const btnAgregar = document.getElementById('btn-agregar');
+            const btnModificar = document.getElementById('btn-modificar');
+            const btnEliminar = document.getElementById('btn-eliminar');
 
             if (txtCodigo) { txtCodigo.value = vendedor.codigo; txtCodigo.disabled = true; }
             if (txtNombre) txtNombre.value = vendedor.nombre;
             if (txtCedula) txtCedula.value = vendedor.cedula;
+
+            if (btnAgregar) btnAgregar.disabled = true;
+            if (btnModificar) btnModificar.disabled = false;
+            if (btnEliminar) btnEliminar.disabled = false;
 
             const form = document.getElementById('form-vendedor') || document.querySelector('form');
             if (form && typeof UIService.limpiarErrores === 'function') {
@@ -186,51 +201,85 @@ export class VendedorController {
             this.validarCodigo();
             this.validarNombre();
             this.validarCedula();
+            this.listar(); 
         }
     }
 
     modificar() {
-        const cValido = this.validarCodigo();
-        const nValido = this.validarNombre();
-        const ceValido = this.validarCedula();
-
-        if (!cValido || !nValido || !ceValido) {
-            UIService.mostrarNotificacion('Por favor, corrija los errores antes de modificar.', 'danger');
+        if (!this.codigoEnEdicion) {
+            UIService.mostrarNotificacion('Debe seleccionar un vendedor para modificar.', 'warning');
             return;
         }
 
-        const codigo = document.getElementById('codigo').value.trim();
+        const nValido = this.validarNombre();
+        const ceValido = this.validarCedula();
+
+        if (!nValido || !ceValido) {
+            UIService.mostrarNotificacion('Por favor, corrija los errores antes de guardar.', 'danger');
+            return;
+        }
+
         const nombre = document.getElementById('nombre').value.trim();
         const cedula = document.getElementById('cedula').value.trim();
 
-        const vendedorActualizado = new Vendedor(codigo, nombre, cedula);
+        const vendedorActualizado = new Vendedor(this.codigoEnEdicion, nombre, cedula);
         this.repo.guardar(vendedorActualizado);
 
         UIService.mostrarNotificacion('¡Vendedor modificado con éxito!', 'success');
         this.inicializarFormulario();
     }
 
-    eliminar() {
-        const codigo = document.getElementById('lista-vendedores')?.value;
+    eliminar(codigoEliminar = null) {
+        const codigo = codigoEliminar || this.codigoEnEdicion;
         if (!codigo) {
             UIService.mostrarNotificacion('Debe seleccionar un vendedor para eliminar.', 'warning');
             return;
         }
-        this.repo.eliminar(codigo);
-        UIService.mostrarNotificacion('¡Vendedor eliminado correctamente!', 'success');
-        this.inicializarFormulario();
+
+        if (confirm(`¿Está seguro de que desea eliminar el vendedor ${codigo}?`)) {
+            this.repo.eliminar(codigo);
+            UIService.mostrarNotificacion('¡Vendedor eliminado correctamente!', 'success');
+            this.inicializarFormulario();
+        }
     }
 
     listar(vendedoresFiltrados = null) {
-        const lista = document.getElementById('lista-vendedores');
-        if (!lista) return;
-        lista.innerHTML = '';
+        const tbody = document.getElementById('tabla-vendedores-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
 
         const datos = vendedoresFiltrados || this.repo.todos();
-        for (let vendedor of datos) {
-            let texto = `${vendedor.codigo}  -  ${vendedor.nombre}  -  CI: ${vendedor.cedula}`;
-            lista.add(new Option(texto, vendedor.codigo));
+
+        if (datos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">No hay vendedores registrados.</td></tr>`;
+            return;
         }
+
+        datos.forEach(vendedor => {
+            const tr = document.createElement('tr');
+            if (this.codigoEnEdicion === vendedor.codigo) {
+                tr.classList.add('table-primary');
+            }
+
+            tr.innerHTML = `
+                <td class="fw-bold">${vendedor.codigo}</td>
+                <td>${vendedor.nombre}</td>
+                <td>${vendedor.cedula}</td>
+                <td class="text-end pe-3">
+                    <button type="button" class="btn btn-sm btn-outline-primary me-1 btn-editar-fila" data-codigo="${vendedor.codigo}" title="Editar" aria-label="Editar vendedor ${vendedor.nombre}">
+                        <i class="bi bi-pencil-fill" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-item" data-codigo="${vendedor.codigo}" title="Eliminar vendedor" aria-label="Eliminar vendedor ${vendedor.nombre}">
+                        <i class="bi bi-trash-fill" aria-hidden="true"></i>
+                    </button>
+                </td>
+            `;
+
+            tr.querySelector('.btn-editar-fila').addEventListener('click', () => this.seleccionar(vendedor.codigo));
+            tr.querySelector('.btn-eliminar-item').addEventListener('click', () => this.eliminar(vendedor.codigo));
+
+            tbody.appendChild(tr);
+        });
     }
 
     filtrarLista(filtro) {

@@ -65,8 +65,9 @@
                         <div class="input-group">
                             <select id="select-ciudad" class="form-select bg-light text-dark" aria-label="Seleccionar ciudad para consultar el clima">
                                 <option value="montevideo" selected>Montevideo</option>
-                                <option value="buenos-aires">Buenos Aires</option>
-                                <option value="santiago">Santiago de Chile</option>
+                                <option value="colonia">Colonia</option>
+                                <option value="juan-lacaze">Juan Lacaze</option>
+                                <option value="rosario">Rosario</option>
                             </select>
                             <button id="btn-actualizar-clima" class="btn btn-light fw-bold text-dark px-3">Actualizar</button>
                         </div>
@@ -79,7 +80,7 @@
         <section class="mb-4" aria-labelledby="titulo-catalogo">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
                 <h2 id="titulo-catalogo" class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider">
-                    <i class="bi bi-star-fill text-warning me-2" aria-hidden="true"></i>Catálogo Destacado
+                    <i class="bi bi-star-fill text-warning me-2" aria-hidden="true"></i>Catálogo Destacado De Juguetes
                 </h2>
             </div>
 
@@ -121,8 +122,14 @@
             const info = document.getElementById('info-clima');
             if (!sel || !info) return;
             info.innerHTML = '⏳ Consultando clima...';
+            
             const d = await ApiService.obtenerClima(sel.value);
-            info.innerHTML = d ? `${d.nombre}: <strong>${d.temp}°C</strong>. Viento ${d.viento} km/h` : '❌ Error al cargar.';
+            
+            if (d) {
+                info.innerHTML = `${d.nombre}: <strong>${d.temp}°C</strong>. Viento ${d.viento} km/h (${d.condicion})`;
+            } else {
+                info.innerHTML = '❌ Error al cargar el clima.';
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {

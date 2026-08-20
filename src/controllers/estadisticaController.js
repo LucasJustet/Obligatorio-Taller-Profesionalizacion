@@ -17,10 +17,7 @@ export class EstadisticaController {
             this.calcularYRenderizar();
         });
     }
-
-    /**
-     * Extrae de forma limpia el nombre aunque venga como objeto o string
-     */
+    
     obtenerNombreLimpio(valor) {
         if (!valor) return 'Desconocido';
         if (typeof valor === 'string') return valor;
@@ -34,32 +31,29 @@ export class EstadisticaController {
         const ventas = this.repoVentas.todos();
         const juguetes = this.repoJuguetes.todos();
         const vendedores = this.repoVendedores.todos();
+        
         const totalVentas = ventas.length;
         const totalIngresos = ventas.reduce((acc, v) => acc + (Number(v.total) || Number(v.precio) || 0), 0);
         const stockTotal = juguetes.reduce((acc, j) => acc + (Number(j.stock) || 0), 0);
         const ticketPromedio = totalVentas > 0 ? (totalIngresos / totalVentas) : 0;
+        
         const ventasPorVendedor = {};
-        const ingresosPorVendedor = {};
-
         ventas.forEach(v => {
             const vNombre = this.obtenerNombreLimpio(v.vendedorNombre || v.vendedor);
             ventasPorVendedor[vNombre] = (ventasPorVendedor[vNombre] || 0) + 1;
-            ingresosPorVendedor[vNombre] = (ingresosPorVendedor[vNombre] || 0) + (Number(v.total) || Number(v.precio) || 0);
         });
 
         let topVendedor = 'Sin ventas';
-        let topVendedorInfo = 'Aún no hay ventas registradas';
         let maxVentasVend = 0;
 
         Object.keys(ventasPorVendedor).forEach(nombre => {
             if (ventasPorVendedor[nombre] > maxVentasVend) {
                 maxVentasVend = ventasPorVendedor[nombre];
                 topVendedor = nombre;
-                topVendedorInfo = `${maxVentasVend} ventas ($${ingresosPorVendedor[nombre].toLocaleString('es-UY')})`;
             }
         });
-        const ventasPorJuguete = {};
 
+        const ventasPorJuguete = {};
         ventas.forEach(v => {
             const jNombre = this.obtenerNombreLimpio(v.jugueteNombre || v.juguete);
             const cantidad = Number(v.cantidad) || 1;
@@ -67,16 +61,15 @@ export class EstadisticaController {
         });
 
         let topJuguete = 'Sin ventas';
-        let topJugueteInfo = 'Aún no hay ventas registradas';
         let maxCantJuguete = 0;
 
         Object.keys(ventasPorJuguete).forEach(nombre => {
             if (ventasPorJuguete[nombre] > maxCantJuguete) {
                 maxCantJuguete = ventasPorJuguete[nombre];
                 topJuguete = nombre;
-                topJugueteInfo = `${maxCantJuguete} unid. vendida${maxCantJuguete > 1 ? 's' : ''}`;
             }
         });
+
         this.setTexto('stat-ingresos', `$${totalIngresos.toLocaleString('es-UY', { minimumFractionDigits: 2 })}`);
         this.setTexto('stat-ventas', totalVentas);
         this.setTexto('stat-stock', stockTotal);
@@ -85,9 +78,7 @@ export class EstadisticaController {
 
         this.setTexto('stat-ticket-promedio', `$${ticketPromedio.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
         this.setTexto('stat-top-vendedor', topVendedor);
-        this.setTexto('stat-top-vendedor-info', topVendedorInfo);
         this.setTexto('stat-top-juguete', topJuguete);
-        this.setTexto('stat-top-juguete-info', topJugueteInfo);
     }
 
     setTexto(id, valor) {
