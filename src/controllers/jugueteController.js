@@ -192,17 +192,17 @@ export class JugueteController {
         }
     }
 
-    filtrarLista(filtro) {
-        const texto = filtro.toLowerCase().trim();
-        const todos = this.repo.todos();
-        
-        const filtrados = todos.filter(j => 
-            j.codigo.toLowerCase().includes(texto) || 
-            j.nombre.toLowerCase().includes(texto) || 
-            String(j.precio).toLowerCase().includes(texto) ||
-            String(j.stock).toLowerCase().includes(texto)
-        );
+filtrarLista(filtro) {
+    const texto = (filtro || '').toLowerCase().trim();
+    const todos = this.repo.todos();
+    
+    const filtrados = todos.filter(j => 
+        (j.codigo && j.codigo.toLowerCase().includes(texto)) || 
+        (j.nombre && j.nombre.toLowerCase().includes(texto)) || 
+        String(j.precio).toLowerCase().includes(texto) ||
+        String(j.stock).toLowerCase().includes(texto)
+    );
 
-        this.listar(filtrados);
-    }
+    this.listar(filtrados);
+}
 }

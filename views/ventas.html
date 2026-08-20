@@ -23,6 +23,47 @@
             outline: 3px solid #ffc107 !important;
             outline-offset: 2px !important;
         }
+
+        .select-contenedor {
+            overflow-x: auto;
+            overflow-y: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .select-contenedor::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .select-contenedor::-webkit-scrollbar-thumb {
+            background: #0d6efd;
+            border-radius: 4px;
+        }
+        .select-contenedor::-webkit-scrollbar-track {
+            background: #e9ecef;
+        }
+
+
+        .lista-mejora-visual {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .lista-mejora-visual option {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .lista-mejora-visual option:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .lista-mejora-visual option:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        .lista-mejora-visual option:checked {
+            background-color: #0d6efd !important;
+            color: #ffffff !important;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="text-dark d-flex flex-column">
@@ -56,10 +97,10 @@
                         <a class="nav-link active bg-primary text-white rounded px-3 py-2 fw-semibold" href="./ventas.html" aria-current="page">
                             <i class="bi bi-cart-check me-1" aria-hidden="true"></i> Ventas
                         </a>
-                        <li>
-                        <li class="nav-item">
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-white-50 px-3 py-2 fw-semibold" href="./estadisticas.html">
-                            <i class="bi bi-people me-1" aria-hidden="true"></i> Estadisticas
+                            <i class="bi bi-bar-chart-fill me-1" aria-hidden="true"></i> Estadísticas
                         </a>
                     </li>
                 </ul>
@@ -151,8 +192,12 @@
                     </div>
 
                     <div class="mb-3 flex-grow-1 d-flex flex-column">
-                        <label for="lista-ventas" class="form-label small text-muted fw-bold">Seleccione un elemento de la lista para editar o eliminar:</label>
-                        <select id="lista-ventas" class="form-select font-monospace flex-grow-1 shadow-sm bg-light" size="12" aria-label="Listado de ventas registradas" style="min-height: 280px;"></select>
+                        <label for="lista-ventas" class="form-label small text-muted fw-bold d-flex align-items-center gap-1">
+                            <i class="bi bi-arrows-expand" aria-hidden="true"></i> Desliza a los lados para ver más columnas:
+                        </label>
+                        <div class="select-contenedor border rounded bg-light flex-grow-1 shadow-sm mb-1">
+                            <select id="lista-ventas" class="form-select lista-mejora-visual border-0 bg-transparent h-100" size="16" aria-label="Listado de ventas registradas" style="min-width: 800px; min-height: 380px;"></select>
+                        </div>
                     </div>
 
                     <div class="input-group">
