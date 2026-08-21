@@ -2,7 +2,23 @@
 
 Este proyecto es una aplicación web desarrollada para la gestión integral de una juguetería, incluyendo la administración de inventario de juguetes, vendedores, registro de ventas y visualización de estadísticas.
 
-El sistema funciona de forma totalmente local en el cliente, organizando su arquitectura en vistas (HTML), controladores, modelos, repositorios de almacenamiento y servicios(MVC).
+El sistema funciona de forma totalmente local en el cliente, organizando su arquitectura en vistas (HTML), controladores, modelos, repositorios de almacenamiento y servicios (MVC).
+
+---
+
+## Enlaces de Entrega
+
+* **Enlace al Repositorio GitHub:**:https://github.com/LucasJustet/Obligatorio-Taller-Profesionalizacion.git
+* **URL del Sitio Publicado:**:https://lucasjustet.github.io/Obligatorio-Taller-Profesionalizacion/
+
+---
+
+## Informe de Estado (Requisito de Entrega)
+
+* **Tareas realizadas:** Refactorización inicial de la aplicación, estructuración modular con clases y módulos ES6, integración de Bootstrap, diseño responsivo, manejo del DOM y persistencia mediante LocalStorage.
+* **Problemas encontrados:** Contraste de elementos interactivos (`input` y `select`) durante la navegación por teclado y optimización del rendimiento inicial (LCP).
+* **Soluciones implementadas:** Ajuste de estilos CSS específicos para los indicadores de foco (`focus-visible` con sombras y contornos destacados) y optimización de recursos críticos de la interfaz.
+* **Funcionalidades pendientes:** Ajustes finales de validación y optimización de SEO para la entrega definitiva.
 
 ---
 
@@ -58,5 +74,3 @@ Debido a que la información se almacena localmente en el navegador del usuario:
 * Para restablecer la aplicación a su estado inicial, abra la Consola de Desarrollador (F12) y ejecute:
   ```javascript
   localStorage.clear();
-  ```
-* Como alternativa , puede limpiar los datos del sitio desde la configuración del navegador.
