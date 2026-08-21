@@ -11,7 +11,6 @@ export class VentaController {
     }
 
     init() {
-       
         document.getElementById('btn-agregar')?.addEventListener('click', () => this.agregar());
         document.getElementById('btn-modificar')?.addEventListener('click', () => this.modificar());
         document.getElementById('btn-eliminar')?.addEventListener('click', () => this.eliminar());
@@ -100,6 +99,8 @@ export class VentaController {
         if (selectJuguete) selectJuguete.selectedIndex = 0;
         if (txtCantidad) txtCantidad.value = '1';
         if (txtTotal) txtTotal.value = '0.00';
+        const btnModificar = document.getElementById('btn-modificar');
+        if (btnModificar) btnModificar.disabled = true;
 
         this.calcularTotal();
         this.listar();
@@ -200,6 +201,9 @@ export class VentaController {
             document.getElementById('juguete').value = venta.juguete?.codigo ?? venta.juguete?.id ?? '';
             document.getElementById('cantidad').value = venta.cantidad;
             
+            const btnModificar = document.getElementById('btn-modificar');
+            if (btnModificar) btnModificar.disabled = false;
+
             this.calcularTotal();
             const form = document.getElementById('form-venta');
             if (form) UIService.limpiarErrores(form);
@@ -213,7 +217,7 @@ export class VentaController {
         }
     }
 
-  modificar() {
+    modificar() {
         const fValida = this.validarFecha();
         const vValido = this.validarVendedor();
         const jValido = this.validarJuguete();
@@ -246,7 +250,6 @@ export class VentaController {
             UIService.mostrarNotificacion('El vendedor o el juguete seleccionado no existen.', 'danger');
             return;
         }
-
       
         if (jugueteAntiguo) {
             jugueteAntiguo.stock = Number(jugueteAntiguo.stock) + cantidadAntigua;
@@ -254,7 +257,7 @@ export class VentaController {
 
         if (Number(jugueteNuevo.stock) < nuevaCantidad) {
             UIService.mostrarNotificacion(`Stock insuficiente. Disponible: ${jugueteNuevo.stock}`, 'danger');
-          
+         
             if (jugueteAntiguo) {
                 jugueteAntiguo.stock = Number(jugueteAntiguo.stock) - cantidadAntigua;
                 this.jugueteRepo.guardar(jugueteAntiguo);
@@ -263,11 +266,9 @@ export class VentaController {
         }
 
         if (jugueteAntiguo && jugueteAntiguoId === String(jugueteNuevo.codigo ?? jugueteNuevo.id)) {
-          
             jugueteAntiguo.stock = Number(jugueteAntiguo.stock) - nuevaCantidad;
             this.jugueteRepo.guardar(jugueteAntiguo);
         } else {
-        
             if (jugueteAntiguo) this.jugueteRepo.guardar(jugueteAntiguo);
             jugueteNuevo.stock = Number(jugueteNuevo.stock) - nuevaCantidad;
             this.jugueteRepo.guardar(jugueteNuevo);
@@ -338,8 +339,7 @@ export class VentaController {
             
             tbody.appendChild(tr);
         });
-
-      
+     
         tbody.querySelectorAll('.btn-editar').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const codigo = e.currentTarget.getAttribute('data-codigo');
