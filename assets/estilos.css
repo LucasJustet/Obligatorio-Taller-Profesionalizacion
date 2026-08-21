@@ -13,6 +13,11 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+    height: 100%;
+}
+
 body {
     margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -20,14 +25,16 @@ body {
     color: var(--color-text);
     line-height: 1.5;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden; 
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto; 
 }
 
 .contenedor {
     width: 92%;
     max-width: 1000px;
     margin: 0 auto;
-    padding: 10px 0;
+    padding: 10px 0 30px 0; /
 }
 
 .encabezado {
@@ -57,6 +64,7 @@ body {
 .menu a {
     background-color: #ffffff;
     color: var(--color-primary);
+    text-align: center;
     text-decoration: none;
     font-weight: 700;
     padding: 8px 14px;
@@ -64,6 +72,7 @@ body {
     min-height: 44px;
     display: flex;
     align-items: center;
+    justify-content: center;
     will-change: transform;
     transition: background-color 0.15s ease, transform 0.15s ease;
 }
@@ -81,6 +90,8 @@ body {
     padding: 20px;
     margin-bottom: 24px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    overflow: hidden; 
 }
 
 .titulo {
@@ -169,6 +180,14 @@ a:focus-visible {
     transform: scale(0.98);
 }
 
+table, .table-responsive, .listado-tabla {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+}
+
 .listado select {
     min-height: 150px;
     max-height: 250px;
@@ -190,11 +209,10 @@ a:focus-visible {
     color: #4b6584;
 }
 
-
 @media (max-width: 768px) {
     .contenedor {
         width: 95%;
-        padding: 5px 0;
+        padding: 5px 0 20px 0;
     }
    
     .tarjeta {
