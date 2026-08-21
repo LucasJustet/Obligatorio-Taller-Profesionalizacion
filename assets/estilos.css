@@ -27,14 +27,16 @@ body {
     text-rendering: optimizeLegibility;
     min-height: 100vh;
     overflow-x: hidden;
-    overflow-y: auto; 
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
 }
 
 .contenedor {
     width: 92%;
     max-width: 1000px;
     margin: 0 auto;
-    padding: 10px 0 30px 0; /
+    padding: 10px 0 30px 0;
 }
 
 .encabezado {
@@ -91,7 +93,7 @@ body {
     margin-bottom: 24px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     width: 100%;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .titulo {
@@ -180,19 +182,36 @@ a:focus-visible {
     transform: scale(0.98);
 }
 
+
 table, .table-responsive, .listado-tabla {
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     display: block;
+    touch-action: pan-y;
 }
 
+
 .listado select {
-    min-height: 150px;
-    max-height: 250px;
-    margin-top: 10px;
-    overflow-y: auto;
+    width: 100%;
+    padding: 10px;
+    background-color: #ffffff;
+    color: var(--color-text);
+    border: 1px solid #a5b1c2;
+    border-radius: 8px;
+    font-size: 1rem;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 769px) {
+    .listado select {
+        min-height: 150px;
+        max-height: 250px;
+        margin-top: 10px;
+        overflow-y: auto;
+    }
 }
 
 .imagen-principal {
